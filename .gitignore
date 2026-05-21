@@ -7,3 +7,5 @@ uploads/
 *.txt
 *.text
 prompts/
+
+.vercel

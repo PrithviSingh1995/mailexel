@@ -4,7 +4,6 @@ const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
 const rateLimit = require("express-rate-limit");
-const path = require("path");
 
 const connectDB = require("./config/db");
 const authRoutes = require("./routes/auth.routes");
@@ -13,7 +12,7 @@ const blogRoutes = require("./routes/blog.routes");
 const app = express();
 
 // ── Connect Database ───────────────────────────────────────────────────────────
-connectDB().then(() => seedAdmin());
+connectDB().then(() => seedAdmin()).catch(console.error);
 
 // ── Global Middleware ──────────────────────────────────────────────────────────
 app.use(helmet());
@@ -21,9 +20,6 @@ app.use(cors({ origin: process.env.CORS_ORIGIN || "*", credentials: true }));
 app.use(morgan("dev"));
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
-
-// Serve uploaded images
-app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));
 
 // ── Rate Limiting ──────────────────────────────────────────────────────────────
 const limiter = rateLimit({
@@ -72,18 +68,21 @@ async function seedAdmin() {
   if (!exists) {
     await User.create({
       name: "Admin",
-      email: process.env.ADMIN_EMAIL || "admin@xtraxtor.com",
+      email: process.env.ADMIN_EMAIL || "admin@mailexel.com",
       password: process.env.ADMIN_PASSWORD || "Admin@123456",
       role: "admin",
     });
-    console.log(`Admin user created → ${process.env.ADMIN_EMAIL || "admin@xtraxtor.com"}`);
+    console.log(`Admin user created → ${process.env.ADMIN_EMAIL || "admin@mailexel.com"}`);
   }
 }
 
-// ── Start Server ───────────────────────────────────────────────────────────────
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`\n🚀 Blog API running on http://localhost:${PORT}`);
-  console.log(`   Health: http://localhost:${PORT}/api/health`);
-  console.log(`   Blogs:  http://localhost:${PORT}/api/blogs\n`);
-});
+// ── Start Server (local only) ──────────────────────────────────────────────────
+if (require.main === module) {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => {
+    console.log(`Blog API running on http://localhost:${PORT}`);
+    console.log(`Health: http://localhost:${PORT}/api/health`);
+  });
+}
+
+module.exports = app;
