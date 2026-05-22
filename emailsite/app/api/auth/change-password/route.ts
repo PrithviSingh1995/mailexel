@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
+import bcrypt from "bcryptjs";
 import { getAuthUser } from "@/lib/server/auth";
-import User from "@/lib/models/User";
+import prisma from "@/lib/prisma";
 
 export async function PUT(request: Request) {
   const { user, error } = await getAuthUser(request);
@@ -12,12 +13,12 @@ export async function PUT(request: Request) {
     if (newPassword.length < 8)
       return NextResponse.json({ success: false, message: "New password must be at least 8 characters" }, { status: 400 });
 
-    const fullUser = await User.findById(user!._id).select("+password");
-    if (!fullUser || !(await fullUser.comparePassword(currentPassword)))
+    const fullUser = await prisma.user.findUnique({ where: { id: user!.id } });
+    if (!fullUser || !(await bcrypt.compare(currentPassword, fullUser.password)))
       return NextResponse.json({ success: false, message: "Current password is incorrect" }, { status: 401 });
 
-    fullUser.password = newPassword;
-    await fullUser.save();
+    const hash = await bcrypt.hash(newPassword, 12);
+    await prisma.user.update({ where: { id: user!.id }, data: { password: hash } });
     return NextResponse.json({ success: true, message: "Password updated successfully" });
   } catch (err) {
     return NextResponse.json({ success: false, message: (err as Error).message }, { status: 500 });

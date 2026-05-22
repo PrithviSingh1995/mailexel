@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { connectDB } from "@/lib/db";
-import Blog from "@/lib/models/Blog";
+import prisma from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
@@ -10,12 +9,14 @@ export async function GET(
 ) {
   try {
     const { slug } = await params;
-    await connectDB();
-    const blog = await Blog.findOne({ slug, status: "published" }).populate("author", "name avatar bio");
+    const blog = await prisma.blog.findFirst({
+      where: { slug, status: "published" },
+      include: { author: { select: { id: true, name: true, avatar: true, bio: true } } },
+    });
     if (!blog) return NextResponse.json({ success: false, message: "Blog not found" }, { status: 404 });
 
-    Blog.findByIdAndUpdate(blog._id, { $inc: { views: 1 } }).exec();
-    return NextResponse.json({ success: true, data: blog });
+    prisma.blog.update({ where: { id: blog.id }, data: { views: { increment: 1 } } }).catch(() => {});
+    return NextResponse.json({ success: true, data: { ...blog, _id: blog.id, author: { ...blog.author, _id: blog.author.id } } });
   } catch (err) {
     return NextResponse.json({ success: false, message: (err as Error).message }, { status: 500 });
   }

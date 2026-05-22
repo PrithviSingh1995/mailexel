@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { getAuthUser } from "@/lib/server/auth";
-import { connectDB } from "@/lib/db";
-import Blog from "@/lib/models/Blog";
+import prisma from "@/lib/prisma";
 
 export async function PATCH(
   request: Request,
@@ -11,17 +10,19 @@ export async function PATCH(
   if (error) return error;
   try {
     const { id } = await params;
-    await connectDB();
-    const blog = await Blog.findById(id);
-    if (!blog) return NextResponse.json({ success: false, message: "Blog not found" }, { status: 404 });
-    if (user!.role === "editor" && blog.author.toString() !== String(user!._id))
+    const existing = await prisma.blog.findUnique({ where: { id } });
+    if (!existing) return NextResponse.json({ success: false, message: "Blog not found" }, { status: 404 });
+    if (user!.role === "editor" && existing.authorId !== user!.id)
       return NextResponse.json({ success: false, message: "Access denied" }, { status: 403 });
 
-    blog.status = blog.status === "published" ? "draft" : "published";
-    await blog.save();
+    const newStatus = existing.status === "published" ? "draft" : "published";
+    const blog = await prisma.blog.update({
+      where: { id },
+      data: { status: newStatus, publishedAt: newStatus === "published" && !existing.publishedAt ? new Date() : existing.publishedAt },
+    });
     return NextResponse.json({
       success: true,
-      message: `Blog ${blog.status === "published" ? "published" : "unpublished"} successfully`,
+      message: `Blog ${newStatus === "published" ? "published" : "unpublished"} successfully`,
       data: { status: blog.status, publishedAt: blog.publishedAt },
     });
   } catch (err) {

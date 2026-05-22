@@ -1,13 +1,12 @@
 import { NextResponse } from "next/server";
-import { connectDB } from "@/lib/db";
-import Blog from "@/lib/models/Blog";
+import prisma from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    await connectDB();
-    const tags = await Blog.distinct("tags", { status: "published" });
+    const rows = await prisma.blog.findMany({ where: { status: "published" }, select: { tags: true } });
+    const tags = [...new Set(rows.flatMap((r) => r.tags))];
     return NextResponse.json({ success: true, data: tags });
   } catch (err) {
     return NextResponse.json({ success: false, message: (err as Error).message }, { status: 500 });
