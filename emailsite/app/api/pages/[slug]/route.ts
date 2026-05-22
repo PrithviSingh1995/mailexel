@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getAuthUser } from "@/lib/server/auth";
-import { defaultHomeContent } from "@/lib/types/page-content";
+import { defaultHomeContent, defaultGlobalContent } from "@/lib/types/page-content";
 import { revalidatePath } from "next/cache";
 
 export async function GET(
@@ -10,7 +10,7 @@ export async function GET(
 ) {
   const { slug } = await params;
   const record = await prisma.pageContent.findUnique({ where: { slug } });
-  const defaults = slug === "home" ? defaultHomeContent : {};
+  const defaults = slug === "home" ? defaultHomeContent : slug === "global" ? defaultGlobalContent : {};
   return NextResponse.json({
     success: true,
     data: record ? { ...defaults, ...(record.content as object) } : defaults,

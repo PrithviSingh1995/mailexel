@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { Save, ExternalLink, ChevronDown, ChevronUp, Plus, Trash2 } from "lucide-react";
-import type { HomePageContent, FeatureCard, FaqItem, FooterMenuItem } from "@/lib/types/page-content";
+import type { HomePageContent, FeatureCard, FaqItem } from "@/lib/types/page-content";
 import { defaultHomeContent } from "@/lib/types/page-content";
 
 // ─── Tiny form helpers ────────────────────────────────────────────────────────
@@ -305,95 +305,6 @@ function FaqTab({ data, update }: { data: HomePageContent["faq"]; update: (v: Ho
   );
 }
 
-function FooterTab({ data, update }: { data: HomePageContent["footer"]; update: (v: HomePageContent["footer"]) => void }) {
-  const [expandedMenu, setExpandedMenu] = useState<number | null>(null);
-  const s = (k: keyof typeof data) => (v: string) => update({ ...data, [k]: v });
-
-  const updateMenuItem = (mi: number, patch: Partial<FooterMenuItem>) => {
-    const menuItems = [...data.menuItems];
-    menuItems[mi] = { ...menuItems[mi], ...patch };
-    update({ ...data, menuItems });
-  };
-
-  return (
-    <div className="space-y-5">
-      <Field label="Brand description" value={data.brandDescription} onChange={s("brandDescription")} multiline rows={2} />
-      <Field label="Brand subtext" value={data.brandSubtext} onChange={s("brandSubtext")} multiline rows={2} />
-
-      <div>
-        <label className="text-xs font-semibold text-gray-600 block mb-2">Footer menu columns</label>
-        <div className="space-y-2">
-          {data.menuItems.map((menu, mi) => (
-            <div key={mi} className="border border-gray-200 rounded-xl overflow-hidden">
-              <button type="button" onClick={() => setExpandedMenu(expandedMenu === mi ? null : mi)}
-                className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 text-sm font-semibold text-gray-700 hover:bg-gray-100">
-                {menu.title}
-                {expandedMenu === mi ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-              </button>
-              {expandedMenu === mi && (
-                <div className="p-4 space-y-3">
-                  <Field label="Column title" value={menu.title} onChange={v => updateMenuItem(mi, { title: v })} />
-                  <div>
-                    <div className="flex items-center justify-between mb-1">
-                      <label className="text-xs font-semibold text-gray-600">Links</label>
-                      <button type="button" onClick={() => updateMenuItem(mi, { links: [...menu.links, { text: "", url: "#" }] })}
-                        className="text-xs text-red-600 hover:text-red-700 flex items-center gap-1">
-                        <Plus className="w-3 h-3" /> Add
-                      </button>
-                    </div>
-                    <div className="space-y-2">
-                      {menu.links.map((link, li) => (
-                        <div key={li} className="flex gap-2 items-center">
-                          <input type="text" placeholder="Link text" value={link.text} onChange={e => {
-                            const links = [...menu.links]; links[li] = { ...links[li], text: e.target.value }; updateMenuItem(mi, { links });
-                          }} className="flex-1 px-3 py-1.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500" />
-                          <input type="text" placeholder="URL" value={link.url} onChange={e => {
-                            const links = [...menu.links]; links[li] = { ...links[li], url: e.target.value }; updateMenuItem(mi, { links });
-                          }} className="flex-1 px-3 py-1.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500" />
-                          <button type="button" onClick={() => updateMenuItem(mi, { links: menu.links.filter((_, j) => j !== li) })}
-                            className="text-gray-400 hover:text-red-500 transition-colors">
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div>
-        <div className="flex items-center justify-between mb-1">
-          <label className="text-xs font-semibold text-gray-600">Bottom links</label>
-          <button type="button" onClick={() => update({ ...data, bottomLinks: [...data.bottomLinks, { text: "", url: "#" }] })}
-            className="text-xs text-red-600 hover:text-red-700 flex items-center gap-1">
-            <Plus className="w-3 h-3" /> Add
-          </button>
-        </div>
-        <div className="space-y-2">
-          {data.bottomLinks.map((link, i) => (
-            <div key={i} className="flex gap-2 items-center">
-              <input type="text" placeholder="Link text" value={link.text} onChange={e => {
-                const bottomLinks = [...data.bottomLinks]; bottomLinks[i] = { ...bottomLinks[i], text: e.target.value }; update({ ...data, bottomLinks });
-              }} className="flex-1 px-3 py-1.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500" />
-              <input type="text" placeholder="URL" value={link.url} onChange={e => {
-                const bottomLinks = [...data.bottomLinks]; bottomLinks[i] = { ...bottomLinks[i], url: e.target.value }; update({ ...data, bottomLinks });
-              }} className="flex-1 px-3 py-1.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500" />
-              <button type="button" onClick={() => update({ ...data, bottomLinks: data.bottomLinks.filter((_, j) => j !== i) })}
-                className="text-gray-400 hover:text-red-500 transition-colors">
-                <Trash2 className="w-4 h-4" />
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 // ─── Main editor ──────────────────────────────────────────────────────────────
 
 const TABS = [
@@ -403,7 +314,6 @@ const TABS = [
   { id: "downloadCta", label: "Download CTA" },
   { id: "etherealCta", label: "Ethereal CTA" },
   { id: "faq", label: "FAQ" },
-  { id: "footer", label: "Footer" },
 ] as const;
 
 type TabId = typeof TABS[number]["id"];
@@ -501,7 +411,6 @@ export default function HomePageEditor() {
           {activeTab === "downloadCta" && <DownloadCtaTab data={content.downloadCta} update={update("downloadCta")} />}
           {activeTab === "etherealCta" && <EtherealCtaTab data={content.etherealCta} update={update("etherealCta")} />}
           {activeTab === "faq" && <FaqTab data={content.faq} update={update("faq")} />}
-          {activeTab === "footer" && <FooterTab data={content.footer} update={update("footer")} />}
         </div>
       </div>
     </div>

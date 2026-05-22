@@ -2,8 +2,6 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
-import SiteNavbar from "@/components/sections/SiteNavbar";
-import FooterSection from "@/components/sections/FooterSection";
 import {
   Search,
   Calendar,
@@ -179,8 +177,6 @@ export default function BlogPageClient() {
 
   return (
     <div className="min-h-screen bg-white">
-      <SiteNavbar />
-
       {/* Hero */}
       <section className="bg-black pt-28 pb-16 relative overflow-hidden">
         <div
@@ -361,7 +357,6 @@ export default function BlogPageClient() {
         )}
       </section>
 
-      <FooterSection />
     </div>
   );
 }

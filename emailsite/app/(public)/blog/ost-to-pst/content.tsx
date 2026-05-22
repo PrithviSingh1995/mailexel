@@ -7,8 +7,6 @@ import {
   Award, BookOpen, Zap, Lock, Eye, RefreshCw, HardDrive,
   FileText, User, ExternalLink, X, Check, List,
 } from "lucide-react";
-import SiteNavbar from "@/components/sections/SiteNavbar";
-import FooterSection from "@/components/sections/FooterSection";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 // ── Helper Components ──────────────────────────────────────────────────────────
@@ -138,8 +136,6 @@ export default function OstToPstContent() {
 
   return (
     <div className="min-h-screen bg-white">
-      <SiteNavbar />
-
       {/* ── HERO ──────────────────────────────────────────────────────────────── */}
       <section className="bg-black pt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
@@ -1043,8 +1039,6 @@ export default function OstToPstContent() {
           </div>
         </div>
       </section>
-
-      <FooterSection />
 
       {/* ── FLOATING TABLE OF CONTENTS ────────────────────────────────────────── */}
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center">

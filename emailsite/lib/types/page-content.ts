@@ -96,6 +96,25 @@ export interface FooterContent {
   bottomLinks: FooterLink[];
 }
 
+export interface NavLink {
+  label: string;
+  href: string;
+  dropdown?: string[];
+}
+
+export interface NavContent {
+  links: NavLink[];
+  ctaText: string;
+  ctaHref: string;
+  signInText: string;
+  signInHref: string;
+}
+
+export interface GlobalContent {
+  nav: NavContent;
+  footer: FooterContent;
+}
+
 export interface HomePageContent {
   hero: HeroContent;
   features: FeaturesContent;
@@ -103,7 +122,6 @@ export interface HomePageContent {
   downloadCta: DownloadCtaContent;
   etherealCta: EtherealCtaContent;
   faq: FaqContent;
-  footer: FooterContent;
 }
 
 export const defaultHomeContent: HomePageContent = {
@@ -259,43 +277,61 @@ export const defaultHomeContent: HomePageContent = {
       },
     ],
   },
-  footer: {
-    brandDescription: "The complete email conversion, migration, backup and viewer suite for Windows.",
-    brandSubtext: "Trusted by 500,000+ IT professionals, forensic analysts, and legal teams worldwide.",
-    menuItems: [
-      { title: "Popular Solutions", links: [
-        { text: "PST to MBOX Converter", url: "#" },
-        { text: "MBOX to PST Converter", url: "#" },
-        { text: "PST to PDF Converter", url: "#" },
-        { text: "EML to MSG Converter", url: "#" },
-        { text: "OST to PST Converter", url: "#" },
-      ]},
-      { title: "Technology", links: [
-        { text: "Email Converter", url: "#" },
-        { text: "Email Migration", url: "#" },
-        { text: "Email Backup", url: "#" },
-        { text: "Email Viewer", url: "#" },
-        { text: "Batch Processor", url: "#" },
-      ]},
-      { title: "Company", links: [
-        { text: "About Us", url: "#" },
-        { text: "Blog", url: "#" },
-        { text: "Press Kit", url: "#" },
-        { text: "Careers", url: "#" },
-        { text: "Contact", url: "#" },
-      ]},
-      { title: "Support", links: [
-        { text: "Documentation", url: "#" },
-        { text: "Knowledge Base", url: "#" },
-        { text: "Video Tutorials", url: "#" },
-        { text: "System Requirements", url: "#" },
-      ]},
+};
+
+const defaultFooterContent: FooterContent = {
+  brandDescription: "The complete email conversion, migration, backup and viewer suite for Windows.",
+  brandSubtext: "Trusted by 500,000+ IT professionals, forensic analysts, and legal teams worldwide.",
+  menuItems: [
+    { title: "Popular Solutions", links: [
+      { text: "PST to MBOX Converter", url: "#" },
+      { text: "MBOX to PST Converter", url: "#" },
+      { text: "PST to PDF Converter", url: "#" },
+      { text: "EML to MSG Converter", url: "#" },
+      { text: "OST to PST Converter", url: "#" },
+    ]},
+    { title: "Technology", links: [
+      { text: "Email Converter", url: "#" },
+      { text: "Email Migration", url: "#" },
+      { text: "Email Backup", url: "#" },
+      { text: "Email Viewer", url: "#" },
+      { text: "Batch Processor", url: "#" },
+    ]},
+    { title: "Company", links: [
+      { text: "About Us", url: "#" },
+      { text: "Blog", url: "#" },
+      { text: "Press Kit", url: "#" },
+      { text: "Careers", url: "#" },
+      { text: "Contact", url: "#" },
+    ]},
+    { title: "Support", links: [
+      { text: "Documentation", url: "#" },
+      { text: "Knowledge Base", url: "#" },
+      { text: "Video Tutorials", url: "#" },
+      { text: "System Requirements", url: "#" },
+    ]},
+  ],
+  bottomLinks: [
+    { text: "Terms and Conditions", url: "#" },
+    { text: "Privacy Policy", url: "#" },
+    { text: "GDPR Compliance", url: "#" },
+    { text: "Refund Policy", url: "#" },
+  ],
+};
+
+export const defaultGlobalContent: GlobalContent = {
+  nav: {
+    links: [
+      { label: "Features", href: "#features", dropdown: ["Email Viewer", "Email Converter", "Email Migration", "Email Backup"] },
+      { label: "How It Works", href: "#how-it-works" },
+      { label: "Pricing", href: "#pricing" },
+      { label: "Blog", href: "/blog" },
+      { label: "FAQ", href: "#faq" },
     ],
-    bottomLinks: [
-      { text: "Terms and Conditions", url: "#" },
-      { text: "Privacy Policy", url: "#" },
-      { text: "GDPR Compliance", url: "#" },
-      { text: "Refund Policy", url: "#" },
-    ],
+    ctaText: "Free Download",
+    ctaHref: "#download",
+    signInText: "Sign In",
+    signInHref: "#",
   },
+  footer: defaultFooterContent,
 };

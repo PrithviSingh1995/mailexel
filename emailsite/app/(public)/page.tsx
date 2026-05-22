@@ -1,4 +1,3 @@
-import SiteNavbar from "@/components/sections/SiteNavbar";
 import HeroSection from "@/components/sections/HeroSection";
 import LogoCloud from "@/components/sections/LogoCloud";
 import FeaturesSection from "@/components/sections/FeaturesSection";
@@ -8,7 +7,6 @@ import TestimonialsScroll from "@/components/sections/TestimonialsScroll";
 import TestimonialsGrid from "@/components/sections/TestimonialsGrid";
 import EtherealCTA from "@/components/sections/EtherealCTA";
 import FAQSection from "@/components/sections/FAQSection";
-import FooterSection from "@/components/sections/FooterSection";
 import prisma from "@/lib/prisma";
 import { defaultHomeContent, type HomePageContent } from "@/lib/types/page-content";
 
@@ -29,7 +27,6 @@ export default async function Home() {
 
   return (
     <main className="flex flex-col min-h-screen bg-white">
-      <SiteNavbar />
       <HeroSection content={content.hero} />
       <LogoCloud />
       <FeaturesSection content={content.features} />
@@ -39,7 +36,6 @@ export default async function Home() {
       <TestimonialsGrid />
       <EtherealCTA content={content.etherealCta} />
       <FAQSection content={content.faq} />
-      <FooterSection content={content.footer} />
     </main>
   );
 }

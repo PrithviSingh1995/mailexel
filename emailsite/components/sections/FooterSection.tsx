@@ -1,7 +1,7 @@
-import { defaultHomeContent, type FooterContent } from "@/lib/types/page-content";
+import { defaultGlobalContent, type FooterContent } from "@/lib/types/page-content";
 
 export default function FooterSection({ content }: { content?: Partial<FooterContent> }) {
-  const c: FooterContent = { ...defaultHomeContent.footer, ...content };
+  const c: FooterContent = { ...defaultGlobalContent.footer, ...content };
 
   return (
     <footer className="bg-black border-t border-white/10">

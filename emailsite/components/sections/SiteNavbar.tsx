@@ -1,16 +1,10 @@
 "use client";
 import { useState, useEffect } from "react";
 import { Menu, X, ChevronDown } from "lucide-react";
+import { defaultGlobalContent, type NavContent } from "@/lib/types/page-content";
 
-const navLinks = [
-  { label: "Features", href: "#features", dropdown: ["Email Viewer", "Email Converter", "Email Migration", "Email Backup"] },
-  { label: "How It Works", href: "#how-it-works" },
-  { label: "Pricing", href: "#pricing" },
-  { label: "Blog", href: "/blog" },
-  { label: "FAQ", href: "#faq" },
-];
-
-export default function SiteNavbar() {
+export default function SiteNavbar({ content }: { content?: Partial<NavContent> }) {
+  const c: NavContent = { ...defaultGlobalContent.nav, ...content };
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
@@ -35,7 +29,7 @@ export default function SiteNavbar() {
           </a>
 
           <nav className="hidden md:flex items-center gap-1">
-            {navLinks.map((link) => (
+            {c.links.map((link) => (
               <div key={link.label} className="relative" onMouseEnter={() => link.dropdown && setActiveDropdown(link.label)} onMouseLeave={() => setActiveDropdown(null)}>
                 <a href={link.href} className={`flex items-center gap-1 px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${scrolled ? "text-gray-600 hover:text-black hover:bg-gray-100" : "text-white/80 hover:text-white hover:bg-white/10"}`}>
                   {link.label}
@@ -53,9 +47,9 @@ export default function SiteNavbar() {
           </nav>
 
           <div className="hidden md:flex items-center gap-3">
-            <a href="#" className={`text-sm font-medium px-3 py-2 transition-colors ${scrolled ? "text-gray-600 hover:text-black" : "text-white/70 hover:text-white"}`}>Sign In</a>
-            <a href="#download" className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200 bg-red-600 text-white hover:bg-red-700">
-              Free Download
+            <a href={c.signInHref} className={`text-sm font-medium px-3 py-2 transition-colors ${scrolled ? "text-gray-600 hover:text-black" : "text-white/70 hover:text-white"}`}>{c.signInText}</a>
+            <a href={c.ctaHref} className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200 bg-red-600 text-white hover:bg-red-700">
+              {c.ctaText}
             </a>
           </div>
 
@@ -68,14 +62,14 @@ export default function SiteNavbar() {
       {mobileOpen && (
         <div className="md:hidden bg-white border-t border-gray-100 shadow-lg">
           <div className="px-4 py-4 space-y-1">
-            {navLinks.map((link) => (
+            {c.links.map((link) => (
               <a key={link.label} href={link.href} className="block px-3 py-2.5 text-sm font-medium text-gray-600 hover:text-black hover:bg-gray-50 rounded-lg transition-colors" onClick={() => setMobileOpen(false)}>
                 {link.label}
               </a>
             ))}
             <div className="pt-3 border-t border-gray-100 flex flex-col gap-2">
-              <a href="#" className="text-center py-2.5 text-sm font-medium text-gray-600">Sign In</a>
-              <a href="#download" className="text-center py-2.5 bg-red-600 text-white text-sm font-semibold rounded-xl" onClick={() => setMobileOpen(false)}>Free Download</a>
+              <a href={c.signInHref} className="text-center py-2.5 text-sm font-medium text-gray-600">{c.signInText}</a>
+              <a href={c.ctaHref} className="text-center py-2.5 bg-red-600 text-white text-sm font-semibold rounded-xl" onClick={() => setMobileOpen(false)}>{c.ctaText}</a>
             </div>
           </div>
         </div>

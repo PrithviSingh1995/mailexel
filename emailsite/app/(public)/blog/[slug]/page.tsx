@@ -3,13 +3,11 @@
 import { useEffect, useState, useRef, useMemo } from "react";
 import { use } from "react";
 import Link from "next/link";
-import SiteNavbar from "@/components/sections/SiteNavbar";
-import FooterSection from "@/components/sections/FooterSection";
 import {
   Calendar, Eye, Clock, Share2, Check,
   BookOpen, ChevronRight, List, X, ArrowLeft,
 } from "lucide-react";
-import "@/app/blog/blog-content.css";
+import "@/app/(public)/blog/blog-content.css";
 import { parseShortcodes } from "@/lib/shortcodes";
 
 const API_BASE = "";
@@ -151,7 +149,6 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <SiteNavbar />
         <div className="flex items-center justify-center h-[60vh]">
           <div className="w-8 h-8 border-2 border-gray-200 border-t-red-500 rounded-full animate-spin" />
         </div>
@@ -162,7 +159,6 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
   if (notFound || !post) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <SiteNavbar />
         <div className="flex flex-col items-center justify-center h-[60vh] gap-4 text-center px-4">
           <div className="w-16 h-16 bg-white border border-gray-200 rounded-2xl flex items-center justify-center shadow-sm">
             <BookOpen className="w-8 h-8 text-gray-300" />
@@ -175,7 +171,6 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
             <ArrowLeft className="w-4 h-4" /> Back to Blog
           </Link>
         </div>
-        <FooterSection />
       </div>
     );
   }
@@ -184,8 +179,6 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <SiteNavbar />
-
       {/* ── HERO ────────────────────────────────────────────────────────────── */}
       <section className="bg-black pt-28 pb-0">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-4 pb-10">
@@ -362,8 +355,6 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
           </div>
         </section>
       )}
-
-      <FooterSection />
 
       {/* ── FLOATING TOC ────────────────────────────────────────────────────── */}
       {tocItems.length > 0 && (
