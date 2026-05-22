@@ -15,7 +15,6 @@ import {
   ChevronRight,
   Images,
   Globe,
-  Settings,
 } from "lucide-react";
 
 function AdminShell({ children }: { children: React.ReactNode }) {
@@ -47,7 +46,6 @@ function AdminShell({ children }: { children: React.ReactNode }) {
   const navItems = [
     { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { href: "/admin/pages", label: "Pages", icon: Globe },
-    { href: "/admin/global", label: "Header & Footer", icon: Settings },
     { href: "/admin/blogs", label: "All Posts", icon: FileText },
     { href: "/admin/blogs/new", label: "New Post", icon: PlusCircle },
     { href: "/admin/images", label: "Image Library", icon: Images },
