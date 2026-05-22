@@ -21,6 +21,13 @@ model User {
   blogs     Blog[]
 }
 
+model PageContent {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  content   Json
+  updatedAt DateTime @updatedAt
+}
+
 model Blog {
   id              String    @id @default(cuid())
   title           String

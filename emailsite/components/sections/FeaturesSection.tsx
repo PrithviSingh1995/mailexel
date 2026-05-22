@@ -1,93 +1,37 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Eye, ArrowLeftRight, RefreshCw, HardDrive, CheckCircle2, ArrowRight } from "lucide-react";
+import { Eye, ArrowLeftRight, RefreshCw, HardDrive, CheckCircle2, ArrowRight, LucideIcon } from "lucide-react";
+import { defaultHomeContent, type FeaturesContent } from "@/lib/types/page-content";
 
-const mainFeatures = [
-  {
-    icon: ArrowLeftRight,
-    title: "Email Converter",
-    badge: "Core Tool",
-    desc: "Convert emails between PST, MBOX, EML, MSG, OST and 50+ formats with full metadata, folder structure and attachment integrity preserved.",
-    items: [
-      "PST → MBOX / EML / MSG / PDF",
-      "Batch convert unlimited files",
-      "Preserve folder hierarchy",
-      "100% metadata accuracy",
-    ],
-  },
-  {
-    icon: RefreshCw,
-    title: "Email Migration",
-    badge: "Cloud Ready",
-    desc: "Migrate entire mailboxes to Office 365, Gmail, Yahoo, Zoho, Thunderbird or Exchange Server — directly, with zero downtime.",
-    items: [
-      "Office 365 ↔ Gmail ↔ Exchange",
-      "IMAP to IMAP migration",
-      "Selective folder migration",
-      "Delta sync & scheduling",
-    ],
-  },
-  {
-    icon: HardDrive,
-    title: "Email Backup",
-    badge: "Secure",
-    desc: "Schedule AES-256 encrypted incremental backups of your entire mailbox. Restore any individual email or full folder in seconds.",
-    items: [
-      "Automated scheduled backup",
-      "AES-256 encryption",
-      "Incremental — saves bandwidth",
-      "One-click restore",
-    ],
-  },
-  {
-    icon: Eye,
-    title: "Email Viewer",
-    badge: "Free",
-    desc: "Open and preview PST, OST, MBOX, EML, MSG and 50+ formats instantly — no Outlook installation or email client required.",
-    items: [
-      "No Outlook required",
-      "Full attachment preview",
-      "Advanced search & filtering",
-      "Export before converting",
-    ],
-  },
-];
+const iconMap: Record<string, LucideIcon> = {
+  "Email Converter": ArrowLeftRight,
+  "Email Migration": RefreshCw,
+  "Email Backup": HardDrive,
+  "Email Viewer": Eye,
+};
 
-const highlights = [
-  { stat: "50+", label: "Supported Formats" },
-  { stat: "10K+", label: "Emails per Minute" },
-  { stat: "100%", label: "Data Accuracy" },
-  { stat: "500K+", label: "Users Worldwide" },
-];
+export default function FeaturesSection({ content }: { content?: Partial<FeaturesContent> }) {
+  const c: FeaturesContent = { ...defaultHomeContent.features, ...content };
 
-export default function FeaturesSection() {
   return (
     <section id="features" className="relative w-full bg-white py-24 overflow-hidden">
-      {/* Subtle background texture */}
       <div className="absolute inset-0 dot-grid-light opacity-50" />
-
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-red-600 text-white rounded-full text-xs font-bold uppercase tracking-wider mb-5">
-            All-in-One Email Suite
+            {c.label}
           </div>
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-black mb-5 tracking-tight">
-            Four tools.{" "}
-            <span className="text-gray-400">
-              One software.
-            </span>
+            {c.title1}{" "}
+            <span className="text-gray-400">{c.title2}</span>
           </h2>
-          <p className="text-lg text-gray-500 max-w-2xl mx-auto">
-            Convert, migrate, backup and view emails — everything you need in a single offline Windows application built for IT professionals and everyday users.
-          </p>
+          <p className="text-lg text-gray-500 max-w-2xl mx-auto">{c.description}</p>
         </div>
 
-        {/* Feature cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
-          {mainFeatures.map((feat, i) => {
-            const Icon = feat.icon;
+          {c.features.map((feat, i) => {
+            const Icon = iconMap[feat.title] ?? ArrowLeftRight;
             return (
               <motion.div
                 key={feat.title}
@@ -118,10 +62,9 @@ export default function FeaturesSection() {
           })}
         </div>
 
-        {/* Stats strip */}
         <div className="bg-black rounded-3xl p-8 md:p-10">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
-            {highlights.map((h) => (
+            {c.stats.map((h) => (
               <div key={h.label} className="text-center">
                 <div className="text-4xl font-black text-white mb-1">{h.stat}</div>
                 <div className="text-sm text-white/50">{h.label}</div>
@@ -129,11 +72,9 @@ export default function FeaturesSection() {
             ))}
           </div>
           <div className="text-center border-t border-white/10 pt-8">
-            <p className="text-white/60 text-sm mb-5 max-w-lg mx-auto">
-              Works entirely offline on Windows 7, 8, 10 &amp; 11. No cloud. No subscription. Just install and run.
-            </p>
-            <a href="#download" className="inline-flex items-center gap-2 px-6 py-3 bg-white hover:bg-gray-100 text-black text-sm font-bold rounded-xl transition-all">
-              Download Free Trial
+            <p className="text-white/60 text-sm mb-5 max-w-lg mx-auto">{c.bottomText}</p>
+            <a href={c.bottomCtaHref} className="inline-flex items-center gap-2 px-6 py-3 bg-white hover:bg-gray-100 text-black text-sm font-bold rounded-xl transition-all">
+              {c.bottomCtaText}
               <ArrowRight className="w-4 h-4" />
             </a>
           </div>

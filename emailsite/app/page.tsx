@@ -9,31 +9,37 @@ import TestimonialsGrid from "@/components/sections/TestimonialsGrid";
 import EtherealCTA from "@/components/sections/EtherealCTA";
 import FAQSection from "@/components/sections/FAQSection";
 import FooterSection from "@/components/sections/FooterSection";
+import prisma from "@/lib/prisma";
+import { defaultHomeContent, type HomePageContent } from "@/lib/types/page-content";
 
-export default function Home() {
+export const revalidate = 60;
+
+async function getHomeContent(): Promise<HomePageContent> {
+  try {
+    const record = await prisma.pageContent.findUnique({ where: { slug: "home" } });
+    if (!record) return defaultHomeContent;
+    return { ...defaultHomeContent, ...(record.content as Partial<HomePageContent>) };
+  } catch {
+    return defaultHomeContent;
+  }
+}
+
+export default async function Home() {
+  const content = await getHomeContent();
+
   return (
     <main className="flex flex-col min-h-screen bg-white">
       <SiteNavbar />
-      {/* 1 — Hero with GSAP animated gradient + app screenshot */}
-      <HeroSection />
-      {/* 2 — Infinite logo cloud (trusted by) */}
+      <HeroSection content={content.hero} />
       <LogoCloud />
-      {/* 3 — Features with BackgroundPaths animated SVG */}
-      <FeaturesSection />
-      {/* 4 — How It Works (3 steps) */}
-      <HowItWorksSection />
-      {/* 5 — Dark Download CTA with spinning rings */}
-      <DownloadCTA />
-      {/* 6 — 3-column scrolling testimonials */}
+      <FeaturesSection content={content.features} />
+      <HowItWorksSection content={content.howItWorks} />
+      <DownloadCTA content={content.downloadCta} />
       <TestimonialsScroll />
-      {/* 7 — Floating photo testimonial grid */}
       <TestimonialsGrid />
-      {/* 8 — Ethereal beams CTA (canvas beams, no Three.js) */}
-      <EtherealCTA />
-      {/* 9 — Radix accordion FAQ */}
-      <FAQSection />
-      {/* 10 — Footer */}
-      <FooterSection />
+      <EtherealCTA content={content.etherealCta} />
+      <FAQSection content={content.faq} />
+      <FooterSection content={content.footer} />
     </main>
   );
 }

@@ -2,8 +2,12 @@
 
 import { useState, useRef } from "react";
 import { Download, Shield, CheckCircle2, Monitor } from "lucide-react";
+import { defaultHomeContent, type DownloadCtaContent } from "@/lib/types/page-content";
 
-export default function DownloadCTA() {
+const featureIcons = [CheckCircle2, Shield, Monitor, CheckCircle2];
+
+export default function DownloadCTA({ content }: { content?: Partial<DownloadCtaContent> }) {
+  const c: DownloadCtaContent = { ...defaultHomeContent.downloadCta, ...content };
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success">("idle");
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -43,48 +47,42 @@ export default function DownloadCTA() {
 
   return (
     <section id="download" className="w-full bg-black overflow-hidden relative">
-      {/* Dot grid overlay */}
       <div className="absolute inset-0 dot-grid" />
-      {/* Subtle center glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-white/[0.03] rounded-full blur-[100px]" />
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
 
       <div className="relative z-10 w-full py-20 flex flex-col items-center gap-6 px-4">
-        {/* Icon */}
         <div className="w-16 h-16 rounded-2xl bg-red-600 flex items-center justify-center shadow-2xl shadow-red-900/40">
           <Download className="w-8 h-8 text-white" />
         </div>
 
         <div className="text-center max-w-2xl">
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 border border-white/15 rounded-full text-xs font-bold text-white/70 uppercase tracking-wider mb-4">
-            #1 Email Management Software
+            {c.badge}
           </div>
           <h2 className="text-4xl md:text-5xl font-black text-white mb-3">
-            Start Managing Emails{" "}
-            <span className="text-white/40">for Free</span>
+            {c.title1}{" "}
+            <span className="text-white/40">{c.title2}</span>
           </h2>
-          <p className="text-lg text-white/50 leading-relaxed">
-            Download MailExel free — no credit card required. Full-featured trial. Works on Windows 7, 8, 10 &amp; 11.
-          </p>
+          <p className="text-lg text-white/50 leading-relaxed">{c.description}</p>
         </div>
 
-        {/* Features row */}
         <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-white/50">
-          <span className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-white/70" />No Credit Card</span>
-          <span className="flex items-center gap-2"><Shield className="w-4 h-4 text-white/70" />Virus &amp; Ad Free</span>
-          <span className="flex items-center gap-2"><Monitor className="w-4 h-4 text-white/70" />Windows 7–11</span>
-          <span className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-white/70" />24/7 Support</span>
+          {c.features.map((feat, i) => {
+            const Icon = featureIcons[i % featureIcons.length];
+            return (
+              <span key={i} className="flex items-center gap-2">
+                <Icon className="w-4 h-4 text-white/70" />
+                {feat}
+              </span>
+            );
+          })}
         </div>
 
-        {/* Email form */}
         <div className="w-full max-w-md h-[60px] relative mt-2">
           <canvas ref={canvasRef} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] pointer-events-none z-50" />
-
-          {/* Success state */}
           <div className={`absolute inset-0 flex items-center justify-center rounded-full transition-all duration-500 ${status === "success" ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"}`} style={{ backgroundColor: "#16a34a" }}>
-            {status === "success" && <>
-              <div className="absolute top-1/2 left-1/2 w-full h-full rounded-full border-2 border-green-400" style={{ animation: "cr .8s ease-out forwards", transform: "translate(-50%,-50%)" }} />
-            </>}
+            {status === "success" && <div className="absolute top-1/2 left-1/2 w-full h-full rounded-full border-2 border-green-400" style={{ animation: "cr .8s ease-out forwards", transform: "translate(-50%,-50%)" }} />}
             <div className="flex items-center gap-2 text-white font-bold text-base">
               <div className="bg-white/20 p-1 rounded-full">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -94,8 +92,6 @@ export default function DownloadCTA() {
               Download link sent!
             </div>
           </div>
-
-          {/* Form */}
           <form onSubmit={handleSubmit} className={`relative w-full h-full transition-all duration-500 ${status === "success" ? "opacity-0 scale-95 pointer-events-none" : "opacity-100 scale-100"}`}>
             <input
               type="email" required placeholder="Enter your work email" value={email}
@@ -118,7 +114,7 @@ export default function DownloadCTA() {
           </form>
         </div>
 
-        <p className="text-xs text-white/25 text-center">Windows · 5.8 MB · v9.2.1 · Electronic Delivery · English</p>
+        <p className="text-xs text-white/25 text-center">{c.versionText}</p>
       </div>
     </section>
   );
