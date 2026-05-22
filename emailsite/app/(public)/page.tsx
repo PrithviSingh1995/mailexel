@@ -66,7 +66,7 @@ export default async function Home() {
       <HowItWorksSection content={content.howItWorks} />
       <DownloadCTA content={content.downloadCta} />
       <TestimonialsScroll reviews={homeReviews.length >= 3 ? homeReviews : undefined} />
-      <TestimonialsGrid avgRating={avgRating} reviewCount={reviewCount} />
+      <TestimonialsGrid avgRating={avgRating} reviewCount={reviewCount} ratingAvg={ratingData.avg} ratingCount={ratingData.count} />
       <EtherealCTA content={content.etherealCta} />
       <FAQSection content={content.faq} />
     </main>

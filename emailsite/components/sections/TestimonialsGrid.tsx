@@ -45,9 +45,21 @@ const testimonials: TestimonialImg[] = [
   { imgSrc: "https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=300", alt: "Support Lead" },
 ];
 
-export default function TestimonialsGrid({ avgRating, reviewCount }: { avgRating?: number; reviewCount?: number }) {
-  const ratingDisplay = avgRating != null ? `${avgRating.toFixed(1)}★` : "4.8★";
-  const countDisplay = reviewCount != null && reviewCount > 0 ? `${reviewCount.toLocaleString()}+` : "500K+";
+export default function TestimonialsGrid({
+  avgRating,
+  reviewCount,
+  ratingAvg,
+  ratingCount,
+}: {
+  avgRating?: number;
+  reviewCount?: number;
+  ratingAvg?: number;
+  ratingCount?: number;
+}) {
+  const displayAvg = ratingAvg ?? avgRating;
+  const ratingDisplay = displayAvg != null ? `${displayAvg.toFixed(1)}★` : "4.8★";
+  const displayCount = ratingCount ?? reviewCount;
+  const countDisplay = displayCount != null && displayCount > 0 ? `${displayCount.toLocaleString()}+` : "500K+";
   return (
     <section className={cn("relative w-full bg-gray-50 py-32 sm:py-40 px-4 overflow-hidden")}>
       {/* Floating avatars */}

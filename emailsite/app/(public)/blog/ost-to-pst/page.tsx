@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
 import OstToPstContent from "./content";
+import prisma from "@/lib/prisma";
 
 export const metadata: Metadata = {
   title: "How to Convert OST to PST File — Step-by-Step Guide 2025 | MailExel",
@@ -54,15 +55,18 @@ const howToSchema = {
   ],
 };
 
-const softwareSchema = {
-  "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  name: "MailExel OST to PST Converter",
-  applicationCategory: "UtilitiesApplication",
-  operatingSystem: "Windows",
-  offers: { "@type": "Offer", price: "0", priceCurrency: "USD", description: "Free Trial Available" },
-  aggregateRating: { "@type": "AggregateRating", ratingValue: "4.8", reviewCount: "1842" },
-};
+async function getRatingData() {
+  try {
+    const votes = await prisma.ratingVote.findMany({ select: { rating: true } });
+    const count = votes.length;
+    const avg = count > 0
+      ? Math.round((votes.reduce((s, v) => s + v.rating, 0) / count) * 10) / 10
+      : 4.8;
+    return { avg, count: count || 1842 };
+  } catch {
+    return { avg: 4.8, count: 1842 };
+  }
+}
 
 const faqSchema = {
   "@context": "https://schema.org",
@@ -76,7 +80,17 @@ const faqSchema = {
   ],
 };
 
-export default function Page() {
+export default async function Page() {
+  const { avg, count } = await getRatingData();
+  const softwareSchema = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: "MailExel OST to PST Converter",
+    applicationCategory: "UtilitiesApplication",
+    operatingSystem: "Windows",
+    offers: { "@type": "Offer", price: "0", priceCurrency: "USD", description: "Free Trial Available" },
+    aggregateRating: { "@type": "AggregateRating", ratingValue: avg.toFixed(1), reviewCount: String(count) },
+  };
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />

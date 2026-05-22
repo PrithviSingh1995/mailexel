@@ -295,7 +295,11 @@ export default function HeroSection({
               transition={{ duration: 0.6 }}
               className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 border border-white/15 rounded-full text-sm font-medium text-white mb-6"
             >
-              <span className="text-white/70">{c.badge}</span>
+              <span className="text-white/70">
+                {initialCount > 0
+                  ? `${initialAvg.toFixed(1)}/5 · ${initialCount.toLocaleString()} Ratings`
+                  : c.badge}
+              </span>
               <span className="px-2 py-0.5 bg-white text-black rounded-full text-[10px] font-bold uppercase tracking-wider">{c.ratingLabel}</span>
             </motion.div>
 
@@ -408,7 +412,11 @@ export default function HeroSection({
         >
           {c.stats.map((s) => (
             <div key={s.label} className="text-center">
-              <div className="text-3xl font-black text-white mb-1">{s.val}</div>
+              <div className="text-3xl font-black text-white mb-1">
+                {s.label === "User Rating"
+                  ? `${initialAvg.toFixed(1)}★`
+                  : s.val}
+              </div>
               <div className="text-xs text-white/40 font-medium">{s.label}</div>
             </div>
           ))}

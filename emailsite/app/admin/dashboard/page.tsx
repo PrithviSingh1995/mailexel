@@ -15,6 +15,8 @@ import {
   CheckCircle2,
   Clock,
   CalendarDays,
+  Star,
+  Zap,
 } from "lucide-react";
 
 // ─── Stat card ────────────────────────────────────────────────────────────────
@@ -99,6 +101,67 @@ function TaskStatsCard() {
   );
 }
 
+// ─── Rating stats card ────────────────────────────────────────────────────────
+
+function RatingStatsCard() {
+  const [avg, setAvg] = useState<number | null>(null);
+  const [count, setCount] = useState<number | null>(null);
+  const [seeding, setSeeding] = useState(false);
+  const [seedMsg, setSeedMsg] = useState("");
+
+  function getToken() { return localStorage.getItem("admin_token") ?? ""; }
+
+  useEffect(() => {
+    fetch("/api/ratings")
+      .then(r => r.json())
+      .then(r => { if (r.success) { setAvg(r.data.avg); setCount(r.data.count); } });
+  }, []);
+
+  const seed = async () => {
+    setSeeding(true); setSeedMsg("");
+    try {
+      const res = await fetch("/api/admin/seed-ratings", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+      const data = await res.json();
+      setSeedMsg(data.message);
+      if (data.success) { setAvg(null); setCount(null);
+        fetch("/api/ratings").then(r => r.json()).then(r => { if (r.success) { setAvg(r.data.avg); setCount(r.data.count); } });
+      }
+    } finally { setSeeding(false); }
+  };
+
+  return (
+    <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+      <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+        <div className="flex items-center gap-2">
+          <Star className="w-4 h-4 text-yellow-500" />
+          <h2 className="text-gray-900 font-semibold text-sm">Live Rating Data</h2>
+        </div>
+        {count !== null && count < 1842 && (
+          <button onClick={seed} disabled={seeding}
+            className="flex items-center gap-1.5 text-xs text-white bg-red-600 hover:bg-red-700 px-3 py-1.5 rounded-lg font-semibold disabled:opacity-50 transition-colors">
+            <Zap className="w-3.5 h-3.5" />
+            {seeding ? "Seeding…" : "Seed 1,842 ratings"}
+          </button>
+        )}
+      </div>
+      <div className="grid grid-cols-2 divide-x divide-gray-100">
+        <div className="flex flex-col items-center justify-center py-6 gap-1">
+          <div className="text-2xl font-bold text-gray-900">{avg != null ? avg.toFixed(1) : "—"}</div>
+          <div className="text-xs text-gray-400 font-medium">Avg Rating</div>
+        </div>
+        <div className="flex flex-col items-center justify-center py-6 gap-1">
+          <div className="text-2xl font-bold text-gray-900">{count != null ? count.toLocaleString() : "—"}</div>
+          <div className="text-xs text-gray-400 font-medium">Total Votes</div>
+        </div>
+      </div>
+      {seedMsg && <div className="px-6 pb-4 text-xs text-green-600 font-medium">{seedMsg}</div>}
+    </div>
+  );
+}
+
 // ─── Dashboard ────────────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
@@ -151,6 +214,9 @@ export default function DashboardPage() {
 
       {/* Task stats card */}
       <TaskStatsCard />
+
+      {/* Rating stats card */}
+      <RatingStatsCard />
 
       {/* Top posts */}
       <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
