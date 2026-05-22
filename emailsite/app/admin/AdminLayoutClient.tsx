@@ -16,6 +16,7 @@ import {
   Images,
   Globe,
   Settings,
+  ClipboardList,
 } from "lucide-react";
 
 function AdminShell({ children }: { children: React.ReactNode }) {
@@ -48,6 +49,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
     { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { href: "/admin/pages", label: "Pages", icon: Globe },
     { href: "/admin/global", label: "Header & Footer", icon: Settings },
+    { href: "/admin/tasks", label: "Blog Tasks", icon: ClipboardList },
     { href: "/admin/blogs", label: "All Posts", icon: FileText },
     { href: "/admin/blogs/new", label: "New Post", icon: PlusCircle },
     { href: "/admin/images", label: "Image Library", icon: Images },
