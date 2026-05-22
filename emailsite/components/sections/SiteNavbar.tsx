@@ -47,7 +47,6 @@ export default function SiteNavbar({ content }: { content?: Partial<NavContent> 
           </nav>
 
           <div className="hidden md:flex items-center gap-3">
-            <a href={c.signInHref} className={`text-sm font-medium px-3 py-2 transition-colors ${scrolled ? "text-gray-600 hover:text-black" : "text-white/70 hover:text-white"}`}>{c.signInText}</a>
             <a href={c.ctaHref} className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200 bg-red-600 text-white hover:bg-red-700">
               {c.ctaText}
             </a>
@@ -67,9 +66,8 @@ export default function SiteNavbar({ content }: { content?: Partial<NavContent> 
                 {link.label}
               </a>
             ))}
-            <div className="pt-3 border-t border-gray-100 flex flex-col gap-2">
-              <a href={c.signInHref} className="text-center py-2.5 text-sm font-medium text-gray-600">{c.signInText}</a>
-              <a href={c.ctaHref} className="text-center py-2.5 bg-red-600 text-white text-sm font-semibold rounded-xl" onClick={() => setMobileOpen(false)}>{c.ctaText}</a>
+            <div className="pt-3 border-t border-gray-100">
+              <a href={c.ctaHref} className="block text-center py-2.5 bg-red-600 text-white text-sm font-semibold rounded-xl" onClick={() => setMobileOpen(false)}>{c.ctaText}</a>
             </div>
           </div>
         </div>
