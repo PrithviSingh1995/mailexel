@@ -19,6 +19,11 @@ import {
   Plus,
   Trash2,
   Layout,
+  ClipboardList,
+  CheckCircle2,
+  Clock,
+  XCircle,
+  Send,
 } from "lucide-react";
 
 // ─── Stat card ────────────────────────────────────────────────────────────────
@@ -37,6 +42,143 @@ function StatCard({ label, value, icon: Icon, accent }: {
       <div className={`text-3xl font-bold ${accent ? "text-white" : "text-gray-900"}`}>
         {Number(value).toLocaleString()}
       </div>
+    </div>
+  );
+}
+
+// ─── Task panel ───────────────────────────────────────────────────────────────
+
+type BlogTask = { id: string; title: string; status: string; createdAt: string };
+
+const STATUS_CONFIG: Record<string, { label: string; icon: React.ElementType; className: string }> = {
+  pending:    { label: "Pending",    icon: Clock,         className: "bg-yellow-50 text-yellow-700 border-yellow-200" },
+  processing: { label: "Processing", icon: Send,          className: "bg-blue-50 text-blue-700 border-blue-200" },
+  done:       { label: "Done",       icon: CheckCircle2,  className: "bg-green-50 text-green-700 border-green-200" },
+  failed:     { label: "Failed",     icon: XCircle,       className: "bg-red-50 text-red-700 border-red-200" },
+};
+
+function TaskPanel() {
+  const [tasks, setTasks] = useState<BlogTask[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [input, setInput] = useState("");
+  const [adding, setAdding] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/tasks")
+      .then(r => r.json())
+      .then(r => { if (r.success) setTasks(r.data); })
+      .finally(() => setLoading(false));
+  }, []);
+
+  const addTask = async () => {
+    if (!input.trim()) return;
+    setAdding(true);
+    try {
+      const token = localStorage.getItem("auth_token");
+      const res = await fetch("/api/tasks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ title: input.trim() }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setTasks(prev => [data.data, ...prev]);
+        setInput("");
+      }
+    } finally {
+      setAdding(false);
+    }
+  };
+
+  const deleteTask = async (id: string) => {
+    const token = localStorage.getItem("auth_token");
+    await fetch(`/api/tasks/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
+    setTasks(prev => prev.filter(t => t.id !== id));
+  };
+
+  const updateStatus = async (id: string, status: string) => {
+    const token = localStorage.getItem("auth_token");
+    const res = await fetch(`/api/tasks/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ status }),
+    });
+    const data = await res.json();
+    if (data.success) setTasks(prev => prev.map(t => t.id === id ? data.data : t));
+  };
+
+  return (
+    <div>
+      <div className="flex items-center gap-2 px-6 py-4 border-b border-gray-100">
+        <ClipboardList className="w-4 h-4 text-red-500" />
+        <h2 className="text-gray-900 font-semibold text-sm">Blog Task Queue</h2>
+        <span className="ml-auto text-xs text-gray-400">{tasks.length} task{tasks.length !== 1 ? "s" : ""}</span>
+      </div>
+
+      {/* Add task input */}
+      <div className="px-6 py-4 border-b border-gray-100">
+        <div className="flex gap-2">
+          <input
+            type="text"
+            placeholder="Enter blog title to queue…"
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            onKeyDown={e => e.key === "Enter" && addTask()}
+            className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-red-500"
+          />
+          <button
+            onClick={addTask}
+            disabled={adding || !input.trim()}
+            className="inline-flex items-center gap-1.5 px-4 py-2 bg-red-600 text-white text-sm font-semibold rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            Add
+          </button>
+        </div>
+      </div>
+
+      {/* Task list */}
+      {loading ? (
+        <div className="flex items-center justify-center h-24">
+          <div className="w-6 h-6 border-2 border-gray-200 border-t-red-500 rounded-full animate-spin" />
+        </div>
+      ) : tasks.length === 0 ? (
+        <div className="px-6 py-10 text-center text-gray-400 text-sm">
+          No tasks yet. Add a blog title above to get started.
+        </div>
+      ) : (
+        <div className="divide-y divide-gray-50">
+          {tasks.map(task => {
+            const cfg = STATUS_CONFIG[task.status] ?? STATUS_CONFIG.pending;
+            const Icon = cfg.icon;
+            return (
+              <div key={task.id} className="flex items-center gap-3 px-6 py-3.5 hover:bg-gray-50 transition-colors">
+                <div className="flex-1 min-w-0">
+                  <p className="text-gray-900 text-sm font-medium truncate">{task.title}</p>
+                  <p className="text-gray-400 text-xs mt-0.5">
+                    {new Date(task.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                  </p>
+                </div>
+                <select
+                  value={task.status}
+                  onChange={e => updateStatus(task.id, e.target.value)}
+                  className={`text-xs font-semibold px-2.5 py-1 rounded-lg border cursor-pointer focus:outline-none ${cfg.className}`}
+                >
+                  {Object.entries(STATUS_CONFIG).map(([val, { label }]) => (
+                    <option key={val} value={val}>{label}</option>
+                  ))}
+                </select>
+                <button
+                  onClick={() => deleteTask(task.id)}
+                  className="text-gray-300 hover:text-red-500 transition-colors flex-shrink-0"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
@@ -434,6 +576,11 @@ export default function DashboardPage() {
             </Link>
           </div>
         )}
+      </div>
+
+      {/* Blog task queue */}
+      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+        <TaskPanel />
       </div>
 
       {/* Header & Footer editor */}
