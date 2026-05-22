@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import { Star } from "lucide-react";
+import ReviewForm from "./ReviewForm";
 
 export const dynamic = "force-dynamic";
 
@@ -38,10 +39,11 @@ export default async function ReviewsPage() {
           )}
         </div>
 
+        {/* Reviews grid */}
         {reviews.length === 0 ? (
-          <div className="text-center py-20 text-gray-400">No reviews published yet.</div>
+          <div className="text-center py-16 text-gray-400">No reviews published yet. Be the first!</div>
         ) : (
-          <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6">
+          <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6 mb-16">
             {reviews.map(review => (
               <div key={review.id} className="break-inside-avoid bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
                 {review.tag && (
@@ -72,6 +74,12 @@ export default async function ReviewsPage() {
             ))}
           </div>
         )}
+
+        {/* Write a review */}
+        <div className="max-w-2xl mx-auto">
+          <ReviewForm />
+        </div>
+
       </div>
     </main>
   );

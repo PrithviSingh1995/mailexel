@@ -104,6 +104,7 @@ export default function ReviewsAdmin() {
   };
 
   const published = reviews.filter(r => r.published).length;
+  const pending = reviews.filter(r => !r.published).length;
   const onHome = reviews.filter(r => r.showOnHome).length;
   const avg = reviews.filter(r => r.published).length > 0
     ? (reviews.filter(r => r.published).reduce((s, r) => s + r.rating, 0) / reviews.filter(r => r.published).length).toFixed(1)
@@ -130,14 +131,15 @@ export default function ReviewsAdmin() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-4 gap-4 mb-6">
         {[
-          { label: "Total Reviews", value: reviews.length },
-          { label: "Published", value: published },
-          { label: "Avg Rating (published)", value: avg },
+          { label: "Total", value: reviews.length, color: "" },
+          { label: "Pending Approval", value: pending, color: pending > 0 ? "text-yellow-600" : "" },
+          { label: "Published", value: published, color: "text-green-600" },
+          { label: "Avg Rating", value: avg, color: "" },
         ].map(s => (
-          <div key={s.label} className="bg-white border border-gray-200 rounded-xl p-4">
-            <div className="text-2xl font-bold text-gray-900">{s.value}</div>
+          <div key={s.label} className={`bg-white border rounded-xl p-4 ${pending > 0 && s.label === "Pending Approval" ? "border-yellow-200 bg-yellow-50" : "border-gray-200"}`}>
+            <div className={`text-2xl font-bold ${s.color || "text-gray-900"}`}>{s.value}</div>
             <div className="text-xs text-gray-500 mt-1">{s.label}</div>
           </div>
         ))}
@@ -191,7 +193,10 @@ export default function ReviewsAdmin() {
       <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
           <h2 className="text-sm font-semibold text-gray-900">All Reviews ({reviews.length})</h2>
-          <span className="text-xs text-gray-400">{onHome} pinned to homepage</span>
+          <div className="flex items-center gap-3">
+            {pending > 0 && <span className="px-2 py-0.5 bg-yellow-100 text-yellow-700 text-xs font-bold rounded-full">{pending} pending approval</span>}
+            <span className="text-xs text-gray-400">{onHome} pinned to homepage</span>
+          </div>
         </div>
 
         {loading ? (
@@ -203,7 +208,7 @@ export default function ReviewsAdmin() {
         ) : (
           <div className="divide-y divide-gray-50">
             {reviews.map(review => (
-              <div key={review.id} className="px-6 py-5">
+              <div key={review.id} className={`px-6 py-5 ${!review.published ? "bg-yellow-50/40" : ""}`}>
                 <div className="flex items-start gap-4">
                   {/* Avatar */}
                   <div className="flex-shrink-0">
@@ -221,6 +226,7 @@ export default function ReviewsAdmin() {
                     <div className="flex items-center gap-2 flex-wrap mb-1">
                       <span className="text-sm font-semibold text-gray-900">{review.authorName}</span>
                       {review.authorRole && <span className="text-xs text-gray-400">{review.authorRole}</span>}
+                      {!review.published && <span className="px-2 py-0.5 bg-yellow-100 text-yellow-700 text-[10px] font-bold rounded-full uppercase tracking-wide">Pending</span>}
                       {review.tag && (
                         <span className={`px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-full ${review.tagDark ? "bg-red-600 text-white" : "bg-gray-100 text-gray-600"}`}>
                           {review.tag}
@@ -237,6 +243,14 @@ export default function ReviewsAdmin() {
 
                   {/* Actions */}
                   <div className="flex items-center gap-2 flex-shrink-0">
+                    {!review.published && (
+                      <button
+                        onClick={() => toggle(review.id, "published", false)}
+                        className="px-3 py-1.5 bg-green-600 text-white text-xs font-semibold rounded-lg hover:bg-green-700 transition-colors"
+                      >
+                        Approve
+                      </button>
+                    )}
                     <button
                       onClick={() => toggle(review.id, "showOnHome", review.showOnHome)}
                       title={review.showOnHome ? "Remove from homepage" : "Pin to homepage"}
