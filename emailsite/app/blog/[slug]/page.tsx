@@ -12,7 +12,7 @@ import {
 import "@/app/blog/blog-content.css";
 import { parseShortcodes } from "@/lib/shortcodes";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_BASE = "";
 
 interface BlogPost {
   _id: string;
