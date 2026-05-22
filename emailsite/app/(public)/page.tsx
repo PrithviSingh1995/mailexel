@@ -22,6 +22,19 @@ async function getHomeContent(): Promise<HomePageContent> {
   }
 }
 
+async function getRatingData() {
+  try {
+    const votes = await prisma.ratingVote.findMany();
+    const count = votes.length;
+    const avg = count > 0
+      ? Math.round((votes.reduce((s, v) => s + v.rating, 0) / count) * 10) / 10
+      : 4.8;
+    return { avg, count };
+  } catch {
+    return { avg: 4.8, count: 0 };
+  }
+}
+
 async function getReviewData() {
   try {
     const reviews = await prisma.review.findMany({
@@ -39,14 +52,15 @@ async function getReviewData() {
 }
 
 export default async function Home() {
-  const [content, { homeReviews, avgRating, reviewCount }] = await Promise.all([
+  const [content, { homeReviews, avgRating, reviewCount }, ratingData] = await Promise.all([
     getHomeContent(),
     getReviewData(),
+    getRatingData(),
   ]);
 
   return (
     <main className="flex flex-col min-h-screen bg-white">
-      <HeroSection content={content.hero} />
+      <HeroSection content={content.hero} initialAvg={ratingData.avg} initialCount={ratingData.count} />
       <LogoCloud />
       <FeaturesSection content={content.features} />
       <HowItWorksSection content={content.howItWorks} />

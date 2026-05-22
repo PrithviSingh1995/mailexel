@@ -28,6 +28,12 @@ model PageContent {
   updatedAt DateTime @updatedAt
 }
 
+model RatingVote {
+  id        String   @id @default(cuid())
+  rating    Int
+  createdAt DateTime @default(now())
+}
+
 model Review {
   id          String   @id @default(cuid())
   authorName  String
