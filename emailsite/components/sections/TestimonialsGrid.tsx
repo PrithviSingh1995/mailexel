@@ -45,7 +45,9 @@ const testimonials: TestimonialImg[] = [
   { imgSrc: "https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=300", alt: "Support Lead" },
 ];
 
-export default function TestimonialsGrid() {
+export default function TestimonialsGrid({ avgRating, reviewCount }: { avgRating?: number; reviewCount?: number }) {
+  const ratingDisplay = avgRating != null ? `${avgRating.toFixed(1)}★` : "4.8★";
+  const countDisplay = reviewCount != null && reviewCount > 0 ? `${reviewCount.toLocaleString()}+` : "500K+";
   return (
     <section className={cn("relative w-full bg-gray-50 py-32 sm:py-40 px-4 overflow-hidden")}>
       {/* Floating avatars */}
@@ -88,7 +90,7 @@ export default function TestimonialsGrid() {
         </a>
 
         <div className="mt-10 grid grid-cols-3 gap-8">
-          {[{ val: "500K+", label: "Customers" }, { val: "4.8★", label: "Avg Rating" }, { val: "50+", label: "Formats" }].map((s) => (
+          {[{ val: countDisplay, label: "Customers" }, { val: ratingDisplay, label: "Avg Rating" }, { val: "50+", label: "Formats" }].map((s) => (
             <div key={s.label} className="text-center">
               <div className="text-2xl font-black text-black">{s.val}</div>
               <div className="text-sm text-gray-500">{s.label}</div>

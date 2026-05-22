@@ -3,32 +3,28 @@
 import React from "react";
 import { motion } from "framer-motion";
 
-interface Testimonial {
-  text: string;
-  image: string;
-  name: string;
-  role: string;
+interface ReviewRow {
+  content: string;
+  authorImage: string;
+  authorName: string;
+  authorRole: string;
   tag: string;
   tagDark: boolean;
 }
 
-const testimonials: Testimonial[] = [
-  { text: "We migrated 2 million emails from Exchange to Office 365 with absolute zero data loss. The migration report gave our compliance team exactly what they needed.", image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=150&h=150", name: "Sarah Mitchell", role: "IT Director · Accenture", tag: "Migration", tagDark: true },
-  { text: "The PST viewer is exceptional for digital forensics. I can open corrupted PST files, search thousands of emails, and export court-ready evidence formats — no Outlook needed.", image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=150&h=150", name: "James Donovan", role: "Forensic Analyst · FBI Cyber", tag: "Viewer", tagDark: false },
-  { text: "Converted 50GB of Thunderbird MBOX to Outlook PST with all attachments and folder structures perfectly preserved. Saved our team 3 weeks of manual work.", image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150&h=150", name: "Priya Ramaswamy", role: "IT Consultant · Deloitte", tag: "Conversion", tagDark: true },
-  { text: "GDPR compliance requires secure email archiving. The AES-256 encrypted backup with instant search-and-restore is exactly what our legal team needed.", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=150&h=150", name: "Thomas Weber", role: "CTO · LegalEdge GmbH", tag: "Backup", tagDark: false },
-  { text: "Managing archives for 30,000 faculty is complex. MailExel handles NSF to PST to MBOX conversions with a consistent, rock-solid interface every time.", image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&q=80&w=150&h=150", name: "Amanda Chen", role: "Sysadmin · Stanford University", tag: "Migration", tagDark: true },
-  { text: "E-discovery requires viewing emails without altering metadata. The viewer is forensically sound — no writes to source files. Date range filtering saved us hundreds of hours.", image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80&w=150&h=150", name: "Robert Okafor", role: "Legal Discovery · Baker McKenzie", tag: "Viewer", tagDark: false },
-  { text: "Batch conversion of 80,000 MSG files to EML in under 30 minutes. The interface is clean and the processing speed is absolutely unmatched by anything else we tried.", image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=150&h=150", name: "Marcus Lee", role: "Systems Engineer · Oracle", tag: "Conversion", tagDark: true },
-  { text: "Switched our entire 200-person org from on-premise Exchange to Gmail using the migration wizard. Zero downtime, zero complaints from users — perfect execution.", image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=150&h=150", name: "Yuki Tanaka", role: "IT Manager · SoftBank", tag: "Migration", tagDark: true },
-  { text: "The scheduled incremental backup has been running silently for 18 months. Never missed a beat. When I needed to restore 200 emails it took exactly 3 minutes.", image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=150&h=150", name: "Ben Carvalho", role: "IT Director · LATAM Airlines", tag: "Backup", tagDark: false },
+const FALLBACK: ReviewRow[] = [
+  { content: "We migrated 2 million emails from Exchange to Office 365 with absolute zero data loss. The migration report gave our compliance team exactly what they needed.", authorImage: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=150&h=150", authorName: "Sarah Mitchell", authorRole: "IT Director · Accenture", tag: "Migration", tagDark: true },
+  { content: "The PST viewer is exceptional for digital forensics. I can open corrupted PST files, search thousands of emails, and export court-ready evidence formats — no Outlook needed.", authorImage: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=150&h=150", authorName: "James Donovan", authorRole: "Forensic Analyst · FBI Cyber", tag: "Viewer", tagDark: false },
+  { content: "Converted 50GB of Thunderbird MBOX to Outlook PST with all attachments and folder structures perfectly preserved. Saved our team 3 weeks of manual work.", authorImage: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150&h=150", authorName: "Priya Ramaswamy", authorRole: "IT Consultant · Deloitte", tag: "Conversion", tagDark: true },
+  { content: "GDPR compliance requires secure email archiving. The AES-256 encrypted backup with instant search-and-restore is exactly what our legal team needed.", authorImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=150&h=150", authorName: "Thomas Weber", authorRole: "CTO · LegalEdge GmbH", tag: "Backup", tagDark: false },
+  { content: "Managing archives for 30,000 faculty is complex. MailExel handles NSF to PST to MBOX conversions with a consistent, rock-solid interface every time.", authorImage: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&q=80&w=150&h=150", authorName: "Amanda Chen", authorRole: "Sysadmin · Stanford University", tag: "Migration", tagDark: true },
+  { content: "E-discovery requires viewing emails without altering metadata. The viewer is forensically sound — no writes to source files. Date range filtering saved us hundreds of hours.", authorImage: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80&w=150&h=150", authorName: "Robert Okafor", authorRole: "Legal Discovery · Baker McKenzie", tag: "Viewer", tagDark: false },
+  { content: "Batch conversion of 80,000 MSG files to EML in under 30 minutes. The interface is clean and the processing speed is absolutely unmatched by anything else we tried.", authorImage: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=150&h=150", authorName: "Marcus Lee", authorRole: "Systems Engineer · Oracle", tag: "Conversion", tagDark: true },
+  { content: "Switched our entire 200-person org from on-premise Exchange to Gmail using the migration wizard. Zero downtime, zero complaints from users — perfect execution.", authorImage: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=150&h=150", authorName: "Yuki Tanaka", authorRole: "IT Manager · SoftBank", tag: "Migration", tagDark: true },
+  { content: "The scheduled incremental backup has been running silently for 18 months. Never missed a beat. When I needed to restore 200 emails it took exactly 3 minutes.", authorImage: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=150&h=150", authorName: "Ben Carvalho", authorRole: "IT Director · LATAM Airlines", tag: "Backup", tagDark: false },
 ];
 
-const firstColumn = testimonials.slice(0, 3);
-const secondColumn = testimonials.slice(3, 6);
-const thirdColumn = testimonials.slice(6, 9);
-
-const TestimonialsColumn = ({ testimonials, duration = 15, className }: { testimonials: Testimonial[]; duration?: number; className?: string }) => (
+const TestimonialsColumn = ({ reviews, duration = 15, className }: { reviews: ReviewRow[]; duration?: number; className?: string }) => (
   <div className={className}>
     <motion.ul
       animate={{ translateY: "-50%" }}
@@ -37,7 +33,7 @@ const TestimonialsColumn = ({ testimonials, duration = 15, className }: { testim
     >
       {[...Array(2)].fill(0).map((_, dupIdx) => (
         <React.Fragment key={dupIdx}>
-          {testimonials.map(({ text, image, name, role, tag, tagDark }, i) => (
+          {reviews.map(({ content, authorImage, authorName, authorRole, tag, tagDark }, i) => (
             <motion.li
               key={`${dupIdx}-${i}`}
               aria-hidden={dupIdx === 1 ? "true" : "false"}
@@ -47,12 +43,18 @@ const TestimonialsColumn = ({ testimonials, duration = 15, className }: { testim
             >
               <span className={`inline-block px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-full mb-3 ${tagDark ? "bg-red-600 text-white" : "bg-gray-100 text-gray-600"}`}>{tag}</span>
               <blockquote className="m-0 p-0">
-                <p className="text-gray-600 leading-relaxed text-sm m-0">&ldquo;{text}&rdquo;</p>
+                <p className="text-gray-600 leading-relaxed text-sm m-0">&ldquo;{content}&rdquo;</p>
                 <footer className="flex items-center gap-3 mt-5">
-                  <img width={40} height={40} src={image} alt={name} className="h-10 w-10 rounded-full object-cover ring-2 ring-gray-100" />
+                  {authorImage ? (
+                    <img width={40} height={40} src={authorImage} alt={authorName} className="h-10 w-10 rounded-full object-cover ring-2 ring-gray-100" />
+                  ) : (
+                    <div className="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center text-red-600 font-bold text-sm ring-2 ring-gray-100">
+                      {authorName.charAt(0)}
+                    </div>
+                  )}
                   <div className="flex flex-col">
-                    <cite className="font-semibold not-italic text-sm text-black">{name}</cite>
-                    <span className="text-xs text-gray-400 mt-0.5">{role}</span>
+                    <cite className="font-semibold not-italic text-sm text-black">{authorName}</cite>
+                    <span className="text-xs text-gray-400 mt-0.5">{authorRole}</span>
                   </div>
                 </footer>
               </blockquote>
@@ -64,7 +66,13 @@ const TestimonialsColumn = ({ testimonials, duration = 15, className }: { testim
   </div>
 );
 
-export default function TestimonialsScroll() {
+export default function TestimonialsScroll({ reviews }: { reviews?: ReviewRow[] }) {
+  const data = reviews && reviews.length >= 3 ? reviews : FALLBACK;
+  const third = Math.ceil(data.length / 3);
+  const col1 = data.slice(0, third);
+  const col2 = data.slice(third, third * 2);
+  const col3 = data.slice(third * 2);
+
   return (
     <section className="bg-white py-24 overflow-hidden">
       <motion.div
@@ -91,9 +99,9 @@ export default function TestimonialsScroll() {
           role="region"
           aria-label="Customer testimonials"
         >
-          <TestimonialsColumn testimonials={firstColumn} duration={15} />
-          <TestimonialsColumn testimonials={secondColumn} className="hidden md:block" duration={20} />
-          <TestimonialsColumn testimonials={thirdColumn} className="hidden lg:block" duration={17} />
+          <TestimonialsColumn reviews={col1} duration={15} />
+          <TestimonialsColumn reviews={col2} className="hidden md:block" duration={20} />
+          <TestimonialsColumn reviews={col3} className="hidden lg:block" duration={17} />
         </div>
       </motion.div>
     </section>
