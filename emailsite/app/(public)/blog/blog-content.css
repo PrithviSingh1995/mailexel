@@ -230,21 +230,48 @@
 .sc-checklist {
   list-style: none;
   padding: 0;
-  margin: 16px 0;
+  margin: 20px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 .sc-checklist li {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
+  gap: 14px;
+  padding: 14px 18px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+}
+.sc-cl-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+  line-height: 1.2;
+  margin-top: 1px;
+}
+.sc-cl-body {
+  flex: 1;
+  min-width: 0;
+}
+.sc-cl-title {
+  display: block;
+  font-weight: 700;
+  color: #111827;
+  font-size: 15px;
+  line-height: 1.4;
+  margin-bottom: 4px;
+}
+.sc-cl-desc {
+  display: block;
+  color: #4b5563;
+  font-size: 14.5px;
+  line-height: 1.65;
+}
+.sc-cl-text {
   color: #374151;
   font-size: 15px;
   line-height: 1.7;
-  margin-bottom: 8px;
-}
-.sc-checklist li::before {
-  content: "✅";
-  flex-shrink: 0;
-  margin-top: 1px;
 }
 
 /* [quote] */

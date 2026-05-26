@@ -61,10 +61,18 @@ export function parseShortcodes(html: string): string {
 </div>`;
   });
 
-  // [checklist]item\nitem\n[/checklist]
+  // [checklist]Title | Description\n...[/checklist]  — pipe splits title from desc
   out = out.replace(/\[checklist\]([\s\S]*?)\[\/checklist\]/gi, (_, body) => {
     const items = body.split("\n").map((l: string) => l.trim()).filter(Boolean);
-    const lis = items.map((item: string) => `<li>${item}</li>`).join("\n");
+    const lis = items.map((item: string) => {
+      const pipe = item.indexOf("|");
+      if (pipe > -1) {
+        const title = item.slice(0, pipe).trim();
+        const desc  = item.slice(pipe + 1).trim();
+        return `<li><span class="sc-cl-icon">✅</span><span class="sc-cl-body"><strong class="sc-cl-title">${title}</strong><span class="sc-cl-desc">${desc}</span></span></li>`;
+      }
+      return `<li><span class="sc-cl-icon">✅</span><span class="sc-cl-text">${item}</span></li>`;
+    }).join("\n");
     return `<ul class="sc-checklist">${lis}</ul>`;
   });
 
@@ -184,7 +192,7 @@ export const SHORTCODES: ShortcodeTemplate[] = [
     label: "Checklist",
     category: "Steps & Lists",
     description: "Checkmark list",
-    template: '[checklist]\nFirst item\nSecond item\nThird item\n[/checklist]',
+    template: '[checklist]\nTitle One | Description for the first item goes here.\nTitle Two | Description for the second item goes here.\nTitle Three | Description for the third item goes here.\n[/checklist]',
   },
   // Tables & Data
   {
