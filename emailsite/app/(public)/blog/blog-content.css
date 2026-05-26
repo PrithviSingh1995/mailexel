@@ -1,3 +1,36 @@
+/* ── Author bio prose ────────────────────────────────────────────────────────── */
+.prose-author {
+  font-size: 15.5px;
+  line-height: 1.85;
+  color: #374151;
+}
+.prose-author p {
+  margin-bottom: 1em;
+}
+.prose-author h2 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #111827;
+  margin-top: 1.6em;
+  margin-bottom: 0.6em;
+}
+.prose-author h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-top: 1.3em;
+  margin-bottom: 0.5em;
+}
+.prose-author strong {
+  color: #111827;
+  font-weight: 700;
+}
+.prose-author a {
+  color: #dc2626;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 /* ── Blog section cards ──────────────────────────────────────────────────────── */
 .blog-section-card {
   background: #ffffff;
