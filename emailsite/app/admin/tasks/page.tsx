@@ -1,9 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ClipboardList, Plus, Trash2, CheckCircle2, Clock, Send, XCircle } from "lucide-react";
+import { ClipboardList, Plus, Trash2, CheckCircle2, Clock, Send, XCircle, User } from "lucide-react";
 
-type BlogTask = { id: string; title: string; status: string; createdAt: string; updatedAt: string };
+type Author = { id: string; name: string; avatar: string };
+type BlogTask = {
+  id: string; title: string; status: string;
+  createdAt: string; updatedAt: string;
+  assignedAuthor: Author | null;
+};
 
 const STATUS_CONFIG: Record<string, { label: string; icon: React.ElementType; cls: string }> = {
   pending:    { label: "Pending",    icon: Clock,        cls: "bg-yellow-50 text-yellow-700 border-yellow-200" },
@@ -12,22 +17,25 @@ const STATUS_CONFIG: Record<string, { label: string; icon: React.ElementType; cl
   failed:     { label: "Failed",     icon: XCircle,      cls: "bg-red-50 text-red-700 border-red-200" },
 };
 
-function getToken() {
-  return localStorage.getItem("admin_token") ?? "";
-}
+function getToken() { return localStorage.getItem("admin_token") ?? ""; }
 
 export default function TasksPage() {
   const [tasks, setTasks] = useState<BlogTask[]>([]);
+  const [authors, setAuthors] = useState<Author[]>([]);
   const [loading, setLoading] = useState(true);
   const [input, setInput] = useState("");
+  const [selectedAuthor, setSelectedAuthor] = useState("");
   const [adding, setAdding] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    fetch("/api/tasks")
-      .then(r => r.json())
-      .then(r => { if (r.success) setTasks(r.data); })
-      .finally(() => setLoading(false));
+    Promise.all([
+      fetch("/api/tasks").then(r => r.json()),
+      fetch("/api/users", { headers: { Authorization: `Bearer ${getToken()}` } }).then(r => r.json()),
+    ]).then(([taskRes, userRes]) => {
+      if (taskRes.success) setTasks(taskRes.data);
+      if (userRes.success) setAuthors(userRes.data);
+    }).finally(() => setLoading(false));
   }, []);
 
   const addTask = async () => {
@@ -38,12 +46,16 @@ export default function TasksPage() {
       const res = await fetch("/api/tasks", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
-        body: JSON.stringify({ title: input.trim() }),
+        body: JSON.stringify({
+          title: input.trim(),
+          ...(selectedAuthor ? { assignedAuthorId: selectedAuthor } : {}),
+        }),
       });
       const data = await res.json();
       if (!data.success) throw new Error(data.message);
       setTasks(prev => [data.data, ...prev]);
       setInput("");
+      setSelectedAuthor("");
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -52,10 +64,7 @@ export default function TasksPage() {
   };
 
   const deleteTask = async (id: string) => {
-    await fetch(`/api/tasks/${id}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${getToken()}` },
-    });
+    await fetch(`/api/tasks/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${getToken()}` } });
     setTasks(prev => prev.filter(t => t.id !== id));
   };
 
@@ -64,6 +73,16 @@ export default function TasksPage() {
       method: "PATCH",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
       body: JSON.stringify({ status }),
+    });
+    const data = await res.json();
+    if (data.success) setTasks(prev => prev.map(t => t.id === id ? data.data : t));
+  };
+
+  const updateAuthor = async (id: string, assignedAuthorId: string) => {
+    const res = await fetch(`/api/tasks/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
+      body: JSON.stringify({ assignedAuthorId: assignedAuthorId || null }),
     });
     const data = await res.json();
     if (data.success) setTasks(prev => prev.map(t => t.id === id ? data.data : t));
@@ -91,9 +110,9 @@ export default function TasksPage() {
       </div>
 
       {/* Add task */}
-      <div className="bg-white border border-gray-200 rounded-xl p-4 mb-4">
+      <div className="bg-white border border-gray-200 rounded-xl p-4 mb-4 space-y-3">
         {error && (
-          <div className="mb-3 px-3 py-2 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">{error}</div>
+          <div className="px-3 py-2 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">{error}</div>
         )}
         <div className="flex gap-2">
           <input
@@ -112,6 +131,21 @@ export default function TasksPage() {
             <Plus className="w-4 h-4" />
             Add Task
           </button>
+        </div>
+
+        {/* Author assignment */}
+        <div className="flex items-center gap-2">
+          <User className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+          <select
+            value={selectedAuthor}
+            onChange={e => setSelectedAuthor(e.target.value)}
+            className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500 bg-white"
+          >
+            <option value="">Assign to author (optional)</option>
+            {authors.map(a => (
+              <option key={a.id} value={a.id}>{a.name}</option>
+            ))}
+          </select>
         </div>
       </div>
 
@@ -138,18 +172,34 @@ export default function TasksPage() {
               const cfg = STATUS_CONFIG[task.status] ?? STATUS_CONFIG.pending;
               const Icon = cfg.icon;
               return (
-                <div key={task.id} className="flex items-center gap-4 px-6 py-4 hover:bg-gray-50 transition-colors">
+                <div key={task.id} className="flex items-center gap-3 px-6 py-4 hover:bg-gray-50 transition-colors">
                   <Icon className={`w-4 h-4 flex-shrink-0 ${
                     task.status === "done" ? "text-green-500" :
                     task.status === "processing" ? "text-blue-500" :
                     task.status === "failed" ? "text-red-500" : "text-yellow-500"
                   }`} />
+
                   <div className="flex-1 min-w-0">
                     <p className="text-gray-900 text-sm font-medium truncate">{task.title}</p>
                     <p className="text-gray-400 text-xs mt-0.5">
                       Added {new Date(task.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                     </p>
                   </div>
+
+                  {/* Author selector */}
+                  <select
+                    value={task.assignedAuthor?.id ?? ""}
+                    onChange={e => updateAuthor(task.id, e.target.value)}
+                    className="text-xs px-2 py-1.5 border border-gray-200 rounded-lg text-gray-600 focus:outline-none focus:ring-1 focus:ring-red-400 bg-white max-w-[130px]"
+                    title="Assigned author"
+                  >
+                    <option value="">No author</option>
+                    {authors.map(a => (
+                      <option key={a.id} value={a.id}>{a.name}</option>
+                    ))}
+                  </select>
+
+                  {/* Status selector */}
                   <select
                     value={task.status}
                     onChange={e => updateStatus(task.id, e.target.value)}
@@ -159,6 +209,7 @@ export default function TasksPage() {
                       <option key={val} value={val}>{label}</option>
                     ))}
                   </select>
+
                   <button
                     onClick={() => deleteTask(task.id)}
                     className="text-gray-300 hover:text-red-500 transition-colors flex-shrink-0"

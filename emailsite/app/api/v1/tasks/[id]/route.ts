@@ -13,7 +13,10 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 
   try {
     const { id } = await params;
-    const task = await prisma.blogTask.findUnique({ where: { id } });
+    const task = await prisma.blogTask.findUnique({
+      where: { id },
+      include: { assignedAuthor: { select: { id: true, name: true } } },
+    });
     if (!task) return NextResponse.json({ success: false, message: "Task not found" }, { status: 404 });
     return NextResponse.json({ success: true, data: task });
   } catch (err) {
@@ -23,8 +26,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 
 /**
  * PATCH /api/v1/tasks/:id
- * Body: { "status": "pending" | "in_progress" | "done" }
- * Updates the task status.
+ * Body: { "status": "pending" | "in_progress" | "done", "assignedAuthorId": "user-id" }
+ * Updates the task status and/or assigned author.
  */
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const auth = checkApiKey(req);
@@ -33,7 +36,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   try {
     const { id } = await params;
     const body = await req.json();
-    const { status, title } = body;
+    const { status, title, assignedAuthorId } = body;
 
     const existing = await prisma.blogTask.findUnique({ where: { id } });
     if (!existing) return NextResponse.json({ success: false, message: "Task not found" }, { status: 404 });
@@ -43,7 +46,9 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       data: {
         ...(status !== undefined && { status }),
         ...(title !== undefined && { title: title.trim() }),
+        ...(assignedAuthorId !== undefined && { assignedAuthorId: assignedAuthorId || null }),
       },
+      include: { assignedAuthor: { select: { id: true, name: true } } },
     });
     return NextResponse.json({ success: true, data: task });
   } catch (err) {

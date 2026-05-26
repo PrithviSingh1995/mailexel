@@ -20,6 +20,7 @@ export async function GET(req: Request) {
     const tasks = await prisma.blogTask.findMany({
       where: status !== "all" ? { status } : undefined,
       orderBy: { createdAt: "desc" },
+      include: { assignedAuthor: { select: { id: true, name: true } } },
     });
     return NextResponse.json({ success: true, data: tasks, count: tasks.length });
   } catch (err) {
@@ -41,7 +42,10 @@ export async function POST(req: Request) {
     if (!title?.trim())
       return NextResponse.json({ success: false, message: "title is required" }, { status: 400 });
 
-    const task = await prisma.blogTask.create({ data: { title: title.trim() } });
+    const task = await prisma.blogTask.create({
+      data: { title: title.trim() },
+      include: { assignedAuthor: { select: { id: true, name: true } } },
+    });
     return NextResponse.json({ success: true, data: task }, { status: 201 });
   } catch (err) {
     return NextResponse.json({ success: false, message: (err as Error).message }, { status: 500 });
