@@ -4,7 +4,7 @@ import { useState, useRef, useMemo } from "react";
 import Link from "next/link";
 import {
   Calendar, Eye, Clock, Share2, Check,
-  BookOpen, ChevronRight, List, X, ArrowLeft,
+  BookOpen, ChevronRight, List, X, ArrowRight, Linkedin,
 } from "lucide-react";
 import "@/app/(public)/blog/blog-content.css";
 import { parseShortcodes } from "@/lib/shortcodes";
@@ -16,7 +16,7 @@ interface BlogPost {
   excerpt: string;
   content: string;
   featuredImage: string;
-  author: { name: string; bio?: string; avatar?: string };
+  author: { id?: string; name: string; bio?: string; avatar?: string; linkedin?: string };
   category: string;
   tags: string[];
   publishedAt: string;
@@ -221,14 +221,34 @@ export default function BlogPostClient({ post, related }: Props) {
                 {(post.author?.name ?? "M")[0].toUpperCase()}
               </div>
             )}
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-1">Written by</p>
               <h3 className="text-gray-900 font-bold text-lg leading-tight mb-1">{post.author?.name ?? "MailExel Team"}</h3>
               {post.author?.bio ? (
-                <p className="text-gray-500 text-sm leading-relaxed">{post.author.bio}</p>
+                <p className="text-gray-500 text-sm leading-relaxed mb-3">{post.author.bio}</p>
               ) : (
-                <p className="text-gray-400 text-sm leading-relaxed">Expert in email management, migration, and data recovery solutions.</p>
+                <p className="text-gray-400 text-sm leading-relaxed mb-3">Expert in email management, migration, and data recovery solutions.</p>
               )}
+              <div className="flex flex-wrap items-center gap-3">
+                {post.author?.id && (
+                  <Link
+                    href={`/author/${post.author.id}`}
+                    className="inline-flex items-center gap-1.5 text-red-600 hover:text-red-700 text-xs font-semibold transition-colors"
+                  >
+                    View Full Profile <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                )}
+                {post.author?.linkedin && (
+                  <a
+                    href={post.author.linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 text-gray-400 hover:text-blue-600 text-xs font-semibold transition-colors"
+                  >
+                    <Linkedin className="w-3.5 h-3.5" /> LinkedIn
+                  </a>
+                )}
+              </div>
             </div>
           </div>
         </div>

@@ -5,11 +5,11 @@ import { Users, Plus, Trash2, Edit2, X, Check, Shield, Pen } from "lucide-react"
 
 type Author = {
   id: string; name: string; email: string; role: string;
-  avatar: string; bio: string; createdAt: string;
+  avatar: string; bio: string; linkedin: string; longBio: string; createdAt: string;
   _count: { blogs: number; assignedTasks: number };
 };
 
-const EMPTY_FORM = { name: "", email: "", password: "", role: "editor", avatar: "", bio: "" };
+const EMPTY_FORM = { name: "", email: "", password: "", role: "editor", avatar: "", bio: "", linkedin: "", longBio: "" };
 
 function getToken() { return localStorage.getItem("admin_token") ?? ""; }
 
@@ -25,6 +25,23 @@ function Field({ label, value, onChange, type = "text", placeholder = "" }: {
         onChange={e => onChange(e.target.value)}
         placeholder={placeholder}
         className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+      />
+    </div>
+  );
+}
+
+function TextareaField({ label, value, onChange, placeholder = "", rows = 4 }: {
+  label: string; value: string; onChange: (v: string) => void; placeholder?: string; rows?: number;
+}) {
+  return (
+    <div>
+      <label className="block text-xs font-semibold text-gray-600 mb-1">{label}</label>
+      <textarea
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        placeholder={placeholder}
+        rows={rows}
+        className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500 resize-y"
       />
     </div>
   );
@@ -51,7 +68,7 @@ export default function AuthorsPage() {
   const openAdd = () => { setEditId(null); setForm({ ...EMPTY_FORM }); setError(""); setShowForm(true); };
   const openEdit = (a: Author) => {
     setEditId(a.id);
-    setForm({ name: a.name, email: a.email, password: "", role: a.role, avatar: a.avatar, bio: a.bio });
+    setForm({ name: a.name, email: a.email, password: "", role: a.role, avatar: a.avatar, bio: a.bio, linkedin: a.linkedin ?? "", longBio: a.longBio ?? "" });
     setError("");
     setShowForm(true);
   };
@@ -66,7 +83,7 @@ export default function AuthorsPage() {
       const url = editId ? `/api/users/${editId}` : "/api/users";
       const method = editId ? "PUT" : "POST";
       const body = editId
-        ? { name: form.name, email: form.email, role: form.role, avatar: form.avatar, bio: form.bio, ...(form.password ? { password: form.password } : {}) }
+        ? { name: form.name, email: form.email, role: form.role, avatar: form.avatar, bio: form.bio, linkedin: form.linkedin, longBio: form.longBio, ...(form.password ? { password: form.password } : {}) }
         : form;
 
       const res = await fetch(url, {
@@ -177,7 +194,9 @@ export default function AuthorsPage() {
           </div>
 
           <Field label="Avatar URL" value={form.avatar} onChange={f("avatar")} placeholder="https://..." />
-          <Field label="Bio" value={form.bio} onChange={f("bio")} placeholder="Short bio for the author page" />
+          <Field label="Short Bio" value={form.bio} onChange={f("bio")} placeholder="One-line bio shown in blog post header" />
+          <Field label="LinkedIn URL" value={form.linkedin} onChange={f("linkedin")} placeholder="https://linkedin.com/in/username" />
+          <TextareaField label="Full Bio (author page)" value={form.longBio} onChange={f("longBio")} placeholder="Detailed bio shown on the public author profile page..." rows={5} />
 
           <div className="flex gap-3 pt-1">
             <button

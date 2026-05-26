@@ -5,7 +5,8 @@ import { getAuthUser } from "@/lib/server/auth";
 
 const safeSelect = {
   id: true, name: true, email: true, role: true,
-  avatar: true, bio: true, createdAt: true, updatedAt: true,
+  avatar: true, bio: true, linkedin: true, longBio: true,
+  createdAt: true, updatedAt: true,
   _count: { select: { blogs: true, assignedTasks: true } },
 };
 
@@ -27,7 +28,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: false, message: "Only admins can create users" }, { status: 403 });
 
   try {
-    const { name, email, password, role = "editor", avatar = "", bio = "" } = await req.json();
+    const { name, email, password, role = "editor", avatar = "", bio = "", linkedin = "", longBio = "" } = await req.json();
     if (!name?.trim() || !email?.trim() || !password)
       return NextResponse.json({ success: false, message: "Name, email, and password are required" }, { status: 400 });
     if (password.length < 8)
@@ -39,7 +40,7 @@ export async function POST(req: Request) {
 
     const hash = await bcrypt.hash(password, 12);
     const user = await prisma.user.create({
-      data: { name: name.trim(), email: email.toLowerCase(), password: hash, role, avatar, bio },
+      data: { name: name.trim(), email: email.toLowerCase(), password: hash, role, avatar, bio, linkedin, longBio },
       select: safeSelect,
     });
     return NextResponse.json({ success: true, data: user }, { status: 201 });

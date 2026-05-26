@@ -44,7 +44,7 @@ export default async function BlogPostPage({ params }: Props) {
 
   const post = await prisma.blog.findUnique({
     where: { slug, status: "published" },
-    include: { author: { select: { id: true, name: true, bio: true, avatar: true } } },
+    include: { author: { select: { id: true, name: true, bio: true, avatar: true, linkedin: true } } },
   });
   if (!post) notFound();
 
@@ -90,9 +90,11 @@ export default async function BlogPostPage({ params }: Props) {
     content: post.content,
     featuredImage: post.featuredImage,
     author: {
+      id: post.author?.id ?? undefined,
       name: post.author?.name ?? "MailExel Team",
       bio: post.author?.bio ?? undefined,
       avatar: post.author?.avatar ?? undefined,
+      linkedin: post.author?.linkedin ?? undefined,
     },
     category: post.category,
     tags: post.tags,

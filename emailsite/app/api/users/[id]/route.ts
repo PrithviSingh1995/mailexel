@@ -5,7 +5,8 @@ import { getAuthUser } from "@/lib/server/auth";
 
 const safeSelect = {
   id: true, name: true, email: true, role: true,
-  avatar: true, bio: true, createdAt: true, updatedAt: true,
+  avatar: true, bio: true, linkedin: true, longBio: true,
+  createdAt: true, updatedAt: true,
   _count: { select: { blogs: true, assignedTasks: true } },
 };
 
@@ -33,7 +34,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     const existing = await prisma.user.findUnique({ where: { id } });
     if (!existing) return NextResponse.json({ success: false, message: "User not found" }, { status: 404 });
 
-    const { name, email, role, avatar, bio, password } = await req.json();
+    const { name, email, role, avatar, bio, linkedin, longBio, password } = await req.json();
 
     if (email && email.toLowerCase() !== existing.email) {
       const conflict = await prisma.user.findUnique({ where: { email: email.toLowerCase() } });
@@ -47,6 +48,8 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     if (role !== undefined) data.role = role;
     if (avatar !== undefined) data.avatar = avatar;
     if (bio !== undefined) data.bio = bio;
+    if (linkedin !== undefined) data.linkedin = linkedin;
+    if (longBio !== undefined) data.longBio = longBio;
     if (password) {
       if (password.length < 8)
         return NextResponse.json({ success: false, message: "Password must be at least 8 characters" }, { status: 400 });
