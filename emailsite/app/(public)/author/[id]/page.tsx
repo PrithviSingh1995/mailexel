@@ -2,7 +2,17 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
-import { Calendar, Eye, BookOpen, Linkedin, ArrowRight } from "lucide-react";
+import { Calendar, Eye, BookOpen, ArrowRight } from "lucide-react";
+
+function LinkedinIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+      <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+      <rect x="2" y="9" width="4" height="12"/>
+      <circle cx="4" cy="4" r="2"/>
+    </svg>
+  );
+}
 
 export const revalidate = 3600;
 
@@ -110,7 +120,7 @@ export default async function AuthorPage({ params }: Props) {
                     rel="noopener noreferrer"
                     className="flex items-center gap-1.5 text-blue-400 hover:text-blue-300 transition-colors font-medium"
                   >
-                    <Linkedin className="w-4 h-4" /> LinkedIn
+                    <LinkedinIcon className="w-4 h-4" /> LinkedIn
                   </a>
                 )}
               </div>
@@ -133,7 +143,7 @@ export default async function AuthorPage({ params }: Props) {
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 mt-4 text-blue-600 hover:text-blue-700 text-sm font-semibold transition-colors"
                 >
-                  <Linkedin className="w-4 h-4" /> Connect on LinkedIn
+                  <LinkedinIcon className="w-4 h-4" /> Connect on LinkedIn
                 </a>
               )}
             </div>

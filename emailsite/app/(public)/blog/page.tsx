@@ -20,7 +20,7 @@ export default async function BlogPage() {
   let initialPosts: {
     _id: string; title: string; slug: string; excerpt: string;
     featuredImage: string; category: string; tags: string[];
-    publishedAt: string | null; views: number;
+    publishedAt: string; views: number;
     author: { name: string };
   }[] = [];
   let initialTotal = 0;
@@ -51,7 +51,7 @@ export default async function BlogPage() {
       featuredImage: p.featuredImage,
       category: p.category,
       tags: p.tags,
-      publishedAt: p.publishedAt?.toISOString() ?? null,
+      publishedAt: p.publishedAt?.toISOString() ?? "",
       views: p.views,
       author: { name: p.author?.name ?? "MailExel Team" },
     }));
