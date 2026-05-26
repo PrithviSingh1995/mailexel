@@ -4,6 +4,29 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
+  async redirects() {
+    return [
+      // Apex → www permanent redirect (308 = permanent, same method)
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "mailexel.com" }],
+        destination: "https://www.mailexel.com/:path*",
+        permanent: true,
+      },
+    ];
+  },
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          { key: "X-Content-Type-Options",  value: "nosniff" },
+          { key: "X-Frame-Options",         value: "SAMEORIGIN" },
+          { key: "Referrer-Policy",         value: "strict-origin-when-cross-origin" },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import {
   Search,
@@ -123,11 +123,24 @@ function BlogCard({ post, featured }: { post: BlogPost; featured?: boolean }) {
   );
 }
 
-export default function BlogPageClient() {
-  const [posts, setPosts] = useState<BlogPost[]>([]);
-  const [pagination, setPagination] = useState<Pagination>({ total: 0, page: 1, totalPages: 1 });
-  const [categories, setCategories] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true);
+interface BlogPageClientProps {
+  initialPosts?: BlogPost[];
+  initialTotal?: number;
+  initialCategories?: string[];
+}
+
+export default function BlogPageClient({ initialPosts, initialTotal = 0, initialCategories = [] }: BlogPageClientProps) {
+  const hasServerData = (initialPosts?.length ?? 0) > 0;
+  const skipFirstFetch = useRef(hasServerData);
+
+  const [posts, setPosts] = useState<BlogPost[]>(initialPosts ?? []);
+  const [pagination, setPagination] = useState<Pagination>({
+    total: initialTotal,
+    page: 1,
+    totalPages: Math.ceil(initialTotal / 9) || 1,
+  });
+  const [categories, setCategories] = useState<string[]>(initialCategories);
+  const [loading, setLoading] = useState(!hasServerData);
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("");
   const [draftSearch, setDraftSearch] = useState("");
@@ -149,21 +162,18 @@ export default function BlogPageClient() {
     }
   }, [search, activeCategory]);
 
-  const fetchCategories = async () => {
-    try {
-      const res = await fetch(`${API_BASE}/api/blogs/categories`);
-      const data = await res.json();
-      if (data.success) setCategories(data.data.filter(Boolean));
-    } catch {
-      // no-op
-    }
-  };
-
   useEffect(() => {
-    fetchCategories();
+    if (categories.length === 0) {
+      fetch(`${API_BASE}/api/blogs/categories`)
+        .then((r) => r.json())
+        .then((data) => { if (data.success) setCategories(data.data.filter(Boolean)); })
+        .catch(() => {});
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
+    if (skipFirstFetch.current) { skipFirstFetch.current = false; return; }
     fetchPosts(1);
   }, [fetchPosts]);
 

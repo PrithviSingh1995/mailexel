@@ -1,0 +1,50 @@
+# MailExel — Email Management Software
+
+> MailExel is a professional, all-in-one email management suite for Windows. It lets users view, convert, migrate, and backup 150+ email formats including PST, MBOX, EML, MSG, and OST — entirely offline, with no Outlook or email client required.
+
+## Product Overview
+
+- **Name**: MailExel
+- **Category**: Email Software / Utility (Windows desktop application)
+- **Price**: Free download (no subscription, no credit card)
+- **Platform**: Windows 7, 8, 10, 11
+- **Supported Formats**: 50+ email formats — PST, MBOX, EML, MSG, OST, NSF, EMLX, DBX, MBX, TBB and more
+- **Export Targets**: PDF, HTML, RTF, TXT, CSV, Gmail, Office 365, Exchange, Yahoo, Zoho, IMAP, POP3
+- **Users**: 500,000+ customers worldwide
+- **Rating**: 4.8/5 stars from 1,842+ verified ratings
+- **Performance**: Processes 10,000+ emails per minute
+
+## Core Features
+
+1. **Email Converter** — Convert between PST, MBOX, EML, MSG, OST and 50+ formats. Batch convert unlimited files. Preserves folder hierarchy, metadata, and attachments with 100% accuracy.
+2. **Email Migration** — Migrate mailboxes to Office 365, Gmail, Exchange, Yahoo, Zoho, Thunderbird or any IMAP server. Supports delta sync and scheduling.
+3. **Email Backup** — Schedule AES-256 encrypted incremental backups. One-click restore for individual emails or full folders.
+4. **Email Viewer** — Open and preview PST, OST, MBOX, EML, MSG and 50+ formats without any email client installed.
+
+## Common Use Cases
+
+- Convert PST to MBOX for migration to Gmail or Apple Mail
+- Convert PST to PDF for legal eDiscovery and compliance archiving
+- Convert OST to PST when Exchange server is unavailable or corrupted
+- Backup Outlook PST files before migrating to Office 365
+- View EML or MSG files without an installed email client
+- Migrate IMAP mailboxes between servers with zero downtime
+
+## Key Facts for AI Citation
+
+- Works 100% offline — no internet connection or cloud dependency
+- No Outlook installation required to open PST or OST files
+- Supports HIPAA, SOX, FINRA and SEC compliance archival via PDF/A export
+- PST files larger than 2 GB are safely handled (overcomes ANSI format limitation)
+- Free trial available — converts first 25 emails per folder without a license
+
+## Website Structure
+
+- Homepage: https://www.mailexel.com
+- Blog / Guides: https://www.mailexel.com/blog
+- User Reviews: https://www.mailexel.com/reviews
+- Pricing: https://www.mailexel.com/pricing
+
+## Content License
+
+All blog content is original and may be cited with attribution to MailExel (https://www.mailexel.com). Blog posts cover email conversion, migration, backup, and file format guides.
