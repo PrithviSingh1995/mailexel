@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, ChangeEvent, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { api, BlogPost, ImageItem } from "@/lib/api";
+import { api, BlogPost, ImageItem, User } from "@/lib/api";
 import { SHORTCODES } from "@/lib/shortcodes";
 import {
   Save,
@@ -20,6 +20,7 @@ import {
   Copy,
   LayoutGrid,
   Code2,
+  UserCircle,
 } from "lucide-react";
 
 interface BlogFormProps {
@@ -206,7 +207,10 @@ export default function BlogForm({ blog, mode }: BlogFormProps) {
     featuredImage: blog?.featuredImage ?? "",
     metaTitle: blog?.metaTitle ?? "",
     metaDescription: blog?.metaDescription ?? "",
+    authorId: blog?.author?._id ?? "",
   });
+  const [users, setUsers] = useState<User[]>([]);
+  const [usersLoading, setUsersLoading] = useState(true);
 
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
@@ -218,6 +222,13 @@ export default function BlogForm({ blog, mode }: BlogFormProps) {
   const [toast, setToast] = useState<{ type: "success" | "error"; msg: string } | null>(null);
   const shortcodesBtnRef = useRef<HTMLButtonElement>(null);
   const shortcodesMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    api.getUsers()
+      .then((r) => setUsers(r.data))
+      .catch(() => {})
+      .finally(() => setUsersLoading(false));
+  }, []);
 
   useEffect(() => {
     if (!shortcodesOpen) return;
@@ -302,6 +313,7 @@ export default function BlogForm({ blog, mode }: BlogFormProps) {
     metaTitle: form.metaTitle || form.title,
     metaDescription: form.metaDescription || form.excerpt,
     status,
+    ...(form.authorId ? { authorId: form.authorId } : {}),
   });
 
   const handleSave = async (status: "draft" | "published") => {
@@ -671,6 +683,39 @@ export default function BlogForm({ blog, mode }: BlogFormProps) {
               />
               <p className="text-gray-400 text-xs mt-1">Comma separated</p>
             </div>
+          </div>
+
+          {/* Author */}
+          <div className="bg-white border border-gray-200 rounded-xl p-5">
+            <label className="flex items-center gap-1.5 text-gray-500 text-xs font-semibold uppercase tracking-wide mb-2">
+              <UserCircle className="w-3.5 h-3.5" /> Author
+            </label>
+            {usersLoading ? (
+              <div className="flex items-center gap-2 py-2 text-gray-400 text-sm">
+                <div className="w-3.5 h-3.5 border-2 border-gray-200 border-t-red-400 rounded-full animate-spin" />
+                Loading authors…
+              </div>
+            ) : users.length === 0 ? (
+              <p className="text-gray-400 text-sm py-1">
+                {blog?.author?.name ? `Current: ${blog.author.name}` : "No authors available"}
+              </p>
+            ) : (
+              <div className="relative">
+                <select
+                  value={form.authorId}
+                  onChange={set("authorId")}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-gray-700 text-sm appearance-none focus:outline-none focus:border-red-300 transition-colors"
+                >
+                  <option value="">— Select author —</option>
+                  {users.map((u) => (
+                    <option key={u.id} value={u.id}>
+                      {u.name} ({u.role})
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+              </div>
+            )}
           </div>
 
           {/* SEO */}

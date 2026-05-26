@@ -38,6 +38,13 @@ export interface BlogPost {
   updatedAt: string;
 }
 
+export interface User {
+  id: string;
+  name: string;
+  role: string;
+  avatar: string;
+}
+
 export interface BlogFormData {
   title: string;
   excerpt: string;
@@ -48,6 +55,7 @@ export interface BlogFormData {
   featuredImage: string;
   metaTitle: string;
   metaDescription: string;
+  authorId?: string;
 }
 
 export type BlogPayload = Omit<BlogFormData, "tags"> & { tags?: string[] };
@@ -108,6 +116,9 @@ export const api = {
 
   deleteBlog: (id: string) =>
     request<{ success: boolean; message: string }>(`/api/blogs/admin/${id}`, { method: "DELETE" }),
+
+  getUsers: () =>
+    request<{ success: boolean; data: User[] }>("/api/users"),
 
   getStats: () => request<{ success: boolean; data: StatsData }>("/api/blogs/admin/stats"),
 

@@ -16,16 +16,17 @@ export async function POST(request: Request) {
   const { user, error } = await getAuthUser(request);
   if (error) return error;
   try {
-    const { title, excerpt, content, category, tags, status, metaTitle, metaDescription, featuredImage } = await request.json();
+    const { title, excerpt, content, category, tags, status, metaTitle, metaDescription, featuredImage, authorId } = await request.json();
     if (!title || !excerpt || !content)
       return NextResponse.json({ success: false, message: "Title, excerpt, and content are required" }, { status: 400 });
 
     const slug = await uniqueSlug(title);
     const tagList = Array.isArray(tags) ? tags : (tags ? String(tags).split(",").map((t: string) => t.trim()) : []);
     const now = status === "published" ? new Date() : null;
+    const resolvedAuthorId = (user!.role === "admin" && authorId) ? authorId : user!.id;
 
     const blog = await prisma.blog.create({
-      data: { title, slug, excerpt, content, category: category || "General", tags: tagList, status: status || "draft", publishedAt: now, metaTitle: metaTitle || title, metaDescription: metaDescription || excerpt, featuredImage: featuredImage || "", authorId: user!.id },
+      data: { title, slug, excerpt, content, category: category || "General", tags: tagList, status: status || "draft", publishedAt: now, metaTitle: metaTitle || title, metaDescription: metaDescription || excerpt, featuredImage: featuredImage || "", authorId: resolvedAuthorId },
       include: { author: { select: { id: true, name: true, avatar: true } } },
     });
     return NextResponse.json({ success: true, data: { ...blog, _id: blog.id, author: { ...blog.author, _id: blog.author.id } } }, { status: 201 });

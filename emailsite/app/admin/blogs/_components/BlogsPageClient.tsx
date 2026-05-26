@@ -142,6 +142,9 @@ export default function BlogsPageClient() {
                       Category
                     </th>
                     <th className="text-left text-gray-500 text-xs font-semibold uppercase tracking-wide px-4 py-3">
+                      Author
+                    </th>
+                    <th className="text-left text-gray-500 text-xs font-semibold uppercase tracking-wide px-4 py-3">
                       Views
                     </th>
                     <th className="text-left text-gray-500 text-xs font-semibold uppercase tracking-wide px-4 py-3">
@@ -172,6 +175,9 @@ export default function BlogsPageClient() {
                       </td>
                       <td className="px-4 py-4">
                         <span className="text-gray-500 text-sm">{blog.category || "—"}</span>
+                      </td>
+                      <td className="px-4 py-4">
+                        <span className="text-gray-500 text-sm">{blog.author?.name || "—"}</span>
                       </td>
                       <td className="px-4 py-4">
                         <span className="flex items-center gap-1 text-gray-500 text-sm">

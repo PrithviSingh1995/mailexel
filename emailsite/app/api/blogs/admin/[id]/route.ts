@@ -63,6 +63,7 @@ export async function PUT(
         ...(body.metaTitle !== undefined && { metaTitle: body.metaTitle }),
         ...(body.metaDescription !== undefined && { metaDescription: body.metaDescription }),
         ...(body.featuredImage !== undefined && { featuredImage: body.featuredImage }),
+        ...(body.authorId !== undefined && user!.role === "admin" && { authorId: body.authorId }),
       },
       include: { author: { select: { id: true, name: true, avatar: true } } },
     });

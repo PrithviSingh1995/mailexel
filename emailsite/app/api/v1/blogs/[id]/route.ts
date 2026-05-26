@@ -43,6 +43,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
  *   featuredImage?: string,
  *   metaTitle?: string,
  *   metaDescription?: string,
+ *   authorId?: string,
  * }
  */
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -55,7 +56,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     if (!existing) return NextResponse.json({ success: false, message: "Blog not found" }, { status: 404 });
 
     const body = await req.json();
-    const { title, excerpt, content, status, category, tags, featuredImage, metaTitle, metaDescription } = body;
+    const { title, excerpt, content, status, category, tags, featuredImage, metaTitle, metaDescription, authorId } = body;
 
     // Re-slug only if title changed
     let slug: string | undefined;
@@ -90,6 +91,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
         ...(featuredImage !== undefined && { featuredImage }),
         ...(metaTitle !== undefined && { metaTitle: metaTitle.trim() }),
         ...(metaDescription !== undefined && { metaDescription: metaDescription.trim() }),
+        ...(authorId !== undefined && { authorId }),
       },
       select: fullSelect,
     });
