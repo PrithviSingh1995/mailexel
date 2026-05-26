@@ -328,6 +328,41 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
         </div>
       </div>
 
+      {/* ── AUTHOR CARD ─────────────────────────────────────────────────────── */}
+      <section className="border-t border-gray-100 bg-white py-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="max-w-3xl flex items-start gap-5 bg-gray-50 border border-gray-200 rounded-2xl p-6">
+            {/* Avatar */}
+            {post.author?.avatar ? (
+              <img
+                src={post.author.avatar}
+                alt={post.author.name}
+                className="w-16 h-16 rounded-full object-cover ring-2 ring-white shadow-sm flex-shrink-0"
+              />
+            ) : (
+              <div className="w-16 h-16 rounded-full bg-red-600 flex items-center justify-center text-white text-2xl font-black flex-shrink-0 shadow-sm">
+                {(post.author?.name ?? "M")[0].toUpperCase()}
+              </div>
+            )}
+
+            {/* Text */}
+            <div className="min-w-0">
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-1">Written by</p>
+              <h3 className="text-gray-900 font-bold text-lg leading-tight mb-1">
+                {post.author?.name ?? "MailExel Team"}
+              </h3>
+              {post.author?.bio ? (
+                <p className="text-gray-500 text-sm leading-relaxed">{post.author.bio}</p>
+              ) : (
+                <p className="text-gray-400 text-sm leading-relaxed">
+                  Expert in email management, migration, and data recovery solutions.
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ── RELATED POSTS ───────────────────────────────────────────────────── */}
       {related.length > 0 && (
         <section className="border-t border-gray-200 bg-white py-14">
