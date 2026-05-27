@@ -531,3 +531,35 @@
 }
 .sc-table-wrap tr:nth-child(even) td { background: #fafafa; }
 .sc-table-wrap tr:hover td { background: #f5f5f5; }
+
+/* [cta] self-closing — prominent download button */
+.sc-dl-wrap {
+  margin: 28px 0;
+  display: flex;
+  justify-content: center;
+}
+.sc-dl-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: #dc2626;
+  color: #fff !important;
+  font-weight: 800;
+  font-size: 15px;
+  padding: 14px 32px;
+  border-radius: 12px;
+  text-decoration: none !important;
+  transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.35);
+  letter-spacing: -0.01em;
+}
+.sc-dl-btn:hover {
+  background: #b91c1c !important;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(220, 38, 38, 0.45);
+}
+.sc-dl-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
