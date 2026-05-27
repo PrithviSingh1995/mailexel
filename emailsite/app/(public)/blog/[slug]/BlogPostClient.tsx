@@ -109,8 +109,9 @@ export default function BlogPostClient({ post, related }: Props) {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* ── HERO ────────────────────────────────────────────────────────────── */}
-      <section className="bg-black pt-28 pb-0">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-4 pb-10">
+      <section className="bg-black pt-28 pb-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-4">
+          {/* Breadcrumb */}
           <nav className="flex items-center gap-1.5 text-xs text-white/40 mb-6">
             <Link href="/" className="hover:text-white transition-colors">Home</Link>
             <ChevronRight className="w-3 h-3" />
@@ -119,59 +120,64 @@ export default function BlogPostClient({ post, related }: Props) {
             <span className="text-white/60 truncate max-w-[240px]">{post.title}</span>
           </nav>
 
-          {post.category && (
-            <Link
-              href={`/blog?category=${encodeURIComponent(post.category)}`}
-              className="inline-flex items-center gap-1.5 bg-red-600/15 border border-red-500/25 text-red-400 text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-full mb-5 hover:bg-red-600/25 transition-colors"
-            >
-              {post.category}
-            </Link>
-          )}
+          {/* Two-column: text left, image right */}
+          <div className={`grid grid-cols-1 ${post.featuredImage ? "lg:grid-cols-[1fr_480px]" : ""} gap-10 items-center`}>
+            {/* Left: text content */}
+            <div>
+              {post.category && (
+                <Link
+                  href={`/blog?category=${encodeURIComponent(post.category)}`}
+                  className="inline-flex items-center gap-1.5 bg-red-600/15 border border-red-500/25 text-red-400 text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-full mb-5 hover:bg-red-600/25 transition-colors"
+                >
+                  {post.category}
+                </Link>
+              )}
 
-          <h1 className="text-white text-3xl sm:text-4xl lg:text-[2.65rem] font-black leading-tight mb-5 tracking-tight">
-            {post.title}
-          </h1>
-          <p className="text-white/55 text-lg leading-relaxed mb-8 max-w-3xl">{post.excerpt}</p>
+              <h1 className="text-white text-3xl sm:text-4xl lg:text-[2.65rem] font-black leading-tight mb-5 tracking-tight">
+                {post.title}
+              </h1>
+              <p className="text-white/55 text-lg leading-relaxed mb-8">{post.excerpt}</p>
 
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-white/40 text-sm border-t border-white/10 pt-5">
-            <button
-              onClick={() => document.getElementById("author-section")?.scrollIntoView({ behavior: "smooth", block: "center" })}
-              className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer"
-              title="View author bio"
-            >
-              <span className="w-7 h-7 bg-white/10 rounded-full flex items-center justify-center text-white text-xs font-bold uppercase">
-                {post.author?.name?.[0] ?? "X"}
-              </span>
-              <span className="text-white/60">{post.author?.name ?? "MailExel Team"}</span>
-            </button>
-            {post.publishedAt && (
-              <span className="flex items-center gap-1.5">
-                <Calendar className="w-3.5 h-3.5" />{formatDate(post.publishedAt)}
-              </span>
+              <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-white/40 text-sm border-t border-white/10 pt-5">
+                <button
+                  onClick={() => document.getElementById("author-section")?.scrollIntoView({ behavior: "smooth", block: "center" })}
+                  className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer"
+                  title="View author bio"
+                >
+                  <span className="w-7 h-7 bg-white/10 rounded-full flex items-center justify-center text-white text-xs font-bold uppercase">
+                    {post.author?.name?.[0] ?? "X"}
+                  </span>
+                  <span className="text-white/60">{post.author?.name ?? "MailExel Team"}</span>
+                </button>
+                {post.publishedAt && (
+                  <span className="flex items-center gap-1.5">
+                    <Calendar className="w-3.5 h-3.5" />{formatDate(post.publishedAt)}
+                  </span>
+                )}
+                <span className="flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5" />{estimateReadTime(post.content)} min read
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <Eye className="w-3.5 h-3.5" />{post.views.toLocaleString()} views
+                </span>
+                <button
+                  onClick={handleShare}
+                  className="flex items-center gap-1.5 ml-auto bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 px-3 py-1.5 rounded-lg transition-colors text-xs"
+                >
+                  {copied ? <><Check className="w-3.5 h-3.5 text-green-400" /> Copied!</> : <><Share2 className="w-3.5 h-3.5" /> Share</>}
+                </button>
+              </div>
+            </div>
+
+            {/* Right: featured image */}
+            {post.featuredImage && (
+              <div className="rounded-2xl overflow-hidden aspect-video bg-gray-900 shadow-2xl shadow-black/40">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={post.featuredImage} alt={post.title} className="w-full h-full object-cover opacity-90" />
+              </div>
             )}
-            <span className="flex items-center gap-1.5">
-              <Clock className="w-3.5 h-3.5" />{estimateReadTime(post.content)} min read
-            </span>
-            <span className="flex items-center gap-1.5">
-              <Eye className="w-3.5 h-3.5" />{post.views.toLocaleString()} views
-            </span>
-            <button
-              onClick={handleShare}
-              className="flex items-center gap-1.5 ml-auto bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 px-3 py-1.5 rounded-lg transition-colors text-xs"
-            >
-              {copied ? <><Check className="w-3.5 h-3.5 text-green-400" /> Copied!</> : <><Share2 className="w-3.5 h-3.5" /> Share</>}
-            </button>
           </div>
         </div>
-
-        {post.featuredImage && (
-          <div className="max-w-7xl mx-auto px-4 sm:px-6">
-            <div className="rounded-t-2xl overflow-hidden aspect-video bg-gray-900">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={post.featuredImage} alt={post.title} className="w-full h-full object-cover opacity-90" />
-            </div>
-          </div>
-        )}
       </section>
 
       {/* ── ARTICLE BODY ────────────────────────────────────────────────────── */}

@@ -47,7 +47,7 @@ function BlogCard({ post, featured }: { post: BlogPost; featured?: boolean }) {
     <Link
       href={`/${post.slug}`}
       className={`group flex flex-col bg-white border border-gray-200 rounded-2xl overflow-hidden hover:border-gray-300 hover:shadow-lg transition-all duration-300 ${
-        featured ? "lg:flex-row-reverse" : ""
+        featured ? "lg:flex-row" : ""
       }`}
     >
       {/* Image */}
