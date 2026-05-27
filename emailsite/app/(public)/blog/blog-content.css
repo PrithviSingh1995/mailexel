@@ -536,7 +536,7 @@
 .sc-dl-wrap {
   margin: 28px 0;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
 }
 .sc-dl-btn {
   display: inline-flex;
