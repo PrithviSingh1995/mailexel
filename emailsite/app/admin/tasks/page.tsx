@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ClipboardList, Plus, Trash2, CheckCircle2, Clock, Send, XCircle, User } from "lucide-react";
+import { ClipboardList, Plus, Trash2, CheckCircle2, Clock, Send, XCircle, User, ChevronDown, FileText } from "lucide-react";
 
 type Author = { id: string; name: string; avatar: string };
 type BlogTask = {
-  id: string; title: string; status: string;
+  id: string; title: string; details: string; status: string;
   createdAt: string; updatedAt: string;
   assignedAuthor: Author | null;
 };
@@ -24,9 +24,13 @@ export default function TasksPage() {
   const [authors, setAuthors] = useState<Author[]>([]);
   const [loading, setLoading] = useState(true);
   const [input, setInput] = useState("");
+  const [details, setDetails] = useState("");
   const [selectedAuthor, setSelectedAuthor] = useState("");
   const [adding, setAdding] = useState(false);
   const [error, setError] = useState("");
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [editDetails, setEditDetails] = useState<Record<string, string>>({});
+  const [savingDetails, setSavingDetails] = useState<string | null>(null);
 
   useEffect(() => {
     Promise.all([
@@ -48,6 +52,7 @@ export default function TasksPage() {
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
         body: JSON.stringify({
           title: input.trim(),
+          details,
           ...(selectedAuthor ? { assignedAuthorId: selectedAuthor } : {}),
         }),
       });
@@ -55,6 +60,7 @@ export default function TasksPage() {
       if (!data.success) throw new Error(data.message);
       setTasks(prev => [data.data, ...prev]);
       setInput("");
+      setDetails("");
       setSelectedAuthor("");
     } catch (e) {
       setError((e as Error).message);
@@ -64,6 +70,7 @@ export default function TasksPage() {
   };
 
   const deleteTask = async (id: string) => {
+    if (!confirm("Delete this task?")) return;
     await fetch(`/api/tasks/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${getToken()}` } });
     setTasks(prev => prev.filter(t => t.id !== id));
   };
@@ -86,6 +93,30 @@ export default function TasksPage() {
     });
     const data = await res.json();
     if (data.success) setTasks(prev => prev.map(t => t.id === id ? data.data : t));
+  };
+
+  const saveDetails = async (id: string) => {
+    setSavingDetails(id);
+    const res = await fetch(`/api/tasks/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
+      body: JSON.stringify({ details: editDetails[id] ?? "" }),
+    });
+    const data = await res.json();
+    if (data.success) {
+      setTasks(prev => prev.map(t => t.id === id ? data.data : t));
+      setExpandedId(null);
+    }
+    setSavingDetails(null);
+  };
+
+  const toggleExpand = (task: BlogTask) => {
+    if (expandedId === task.id) {
+      setExpandedId(null);
+    } else {
+      setExpandedId(task.id);
+      setEditDetails(prev => ({ ...prev, [task.id]: task.details ?? "" }));
+    }
   };
 
   const pending = tasks.filter(t => t.status === "pending").length;
@@ -129,8 +160,22 @@ export default function TasksPage() {
             className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-red-600 text-white text-sm font-semibold rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors"
           >
             <Plus className="w-4 h-4" />
-            Add Task
+            Add
           </button>
+        </div>
+
+        {/* Details */}
+        <div>
+          <label className="block text-xs font-semibold text-gray-400 mb-1.5 flex items-center gap-1.5">
+            <FileText className="w-3.5 h-3.5" /> Additional Details (optional)
+          </label>
+          <textarea
+            value={details}
+            onChange={e => setDetails(e.target.value)}
+            placeholder="Keywords, tone, references, outline points, target audience…"
+            rows={3}
+            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 resize-y"
+          />
         </div>
 
         {/* Author assignment */}
@@ -171,51 +216,96 @@ export default function TasksPage() {
             {tasks.map(task => {
               const cfg = STATUS_CONFIG[task.status] ?? STATUS_CONFIG.pending;
               const Icon = cfg.icon;
+              const isExpanded = expandedId === task.id;
               return (
-                <div key={task.id} className="flex items-center gap-3 px-6 py-4 hover:bg-gray-50 transition-colors">
-                  <Icon className={`w-4 h-4 flex-shrink-0 ${
-                    task.status === "done" ? "text-green-500" :
-                    task.status === "processing" ? "text-blue-500" :
-                    task.status === "failed" ? "text-red-500" : "text-yellow-500"
-                  }`} />
+                <div key={task.id}>
+                  <div className="flex items-center gap-3 px-6 py-4 hover:bg-gray-50 transition-colors">
+                    <Icon className={`w-4 h-4 flex-shrink-0 ${
+                      task.status === "done" ? "text-green-500" :
+                      task.status === "processing" ? "text-blue-500" :
+                      task.status === "failed" ? "text-red-500" : "text-yellow-500"
+                    }`} />
 
-                  <div className="flex-1 min-w-0">
-                    <p className="text-gray-900 text-sm font-medium truncate">{task.title}</p>
-                    <p className="text-gray-400 text-xs mt-0.5">
-                      Added {new Date(task.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-                    </p>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-gray-900 text-sm font-medium truncate">{task.title}</p>
+                      <p className="text-gray-400 text-xs mt-0.5">
+                        {new Date(task.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                        {task.details && <span className="ml-2 text-blue-400">· has details</span>}
+                      </p>
+                    </div>
+
+                    {/* Details toggle */}
+                    <button
+                      onClick={() => toggleExpand(task)}
+                      title="View / edit details"
+                      className={`p-1.5 rounded-lg border transition-colors flex-shrink-0 ${
+                        isExpanded ? "border-blue-300 bg-blue-50 text-blue-600" : "border-gray-200 text-gray-400 hover:text-blue-500 hover:border-blue-200"
+                      }`}
+                    >
+                      <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isExpanded ? "rotate-180" : ""}`} />
+                    </button>
+
+                    {/* Author selector */}
+                    <select
+                      value={task.assignedAuthor?.id ?? ""}
+                      onChange={e => updateAuthor(task.id, e.target.value)}
+                      className="text-xs px-2 py-1.5 border border-gray-200 rounded-lg text-gray-600 focus:outline-none focus:ring-1 focus:ring-red-400 bg-white max-w-[130px]"
+                    >
+                      <option value="">No author</option>
+                      {authors.map(a => (
+                        <option key={a.id} value={a.id}>{a.name}</option>
+                      ))}
+                    </select>
+
+                    {/* Status selector */}
+                    <select
+                      value={task.status}
+                      onChange={e => updateStatus(task.id, e.target.value)}
+                      className={`text-xs font-semibold px-2.5 py-1.5 rounded-lg border cursor-pointer focus:outline-none ${cfg.cls}`}
+                    >
+                      {Object.entries(STATUS_CONFIG).map(([val, { label }]) => (
+                        <option key={val} value={val}>{label}</option>
+                      ))}
+                    </select>
+
+                    <button
+                      onClick={() => deleteTask(task.id)}
+                      className="text-gray-300 hover:text-red-500 transition-colors flex-shrink-0"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </div>
 
-                  {/* Author selector */}
-                  <select
-                    value={task.assignedAuthor?.id ?? ""}
-                    onChange={e => updateAuthor(task.id, e.target.value)}
-                    className="text-xs px-2 py-1.5 border border-gray-200 rounded-lg text-gray-600 focus:outline-none focus:ring-1 focus:ring-red-400 bg-white max-w-[130px]"
-                    title="Assigned author"
-                  >
-                    <option value="">No author</option>
-                    {authors.map(a => (
-                      <option key={a.id} value={a.id}>{a.name}</option>
-                    ))}
-                  </select>
-
-                  {/* Status selector */}
-                  <select
-                    value={task.status}
-                    onChange={e => updateStatus(task.id, e.target.value)}
-                    className={`text-xs font-semibold px-2.5 py-1.5 rounded-lg border cursor-pointer focus:outline-none ${cfg.cls}`}
-                  >
-                    {Object.entries(STATUS_CONFIG).map(([val, { label }]) => (
-                      <option key={val} value={val}>{label}</option>
-                    ))}
-                  </select>
-
-                  <button
-                    onClick={() => deleteTask(task.id)}
-                    className="text-gray-300 hover:text-red-500 transition-colors flex-shrink-0"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                  {/* Details panel */}
+                  {isExpanded && (
+                    <div className="px-6 pb-4 bg-blue-50/40 border-t border-blue-100">
+                      <label className="block text-xs font-semibold text-gray-500 mt-3 mb-1.5 flex items-center gap-1.5">
+                        <FileText className="w-3.5 h-3.5 text-blue-400" /> Additional Details
+                      </label>
+                      <textarea
+                        value={editDetails[task.id] ?? task.details ?? ""}
+                        onChange={e => setEditDetails(prev => ({ ...prev, [task.id]: e.target.value }))}
+                        placeholder="Keywords, tone, references, outline points, target audience…"
+                        rows={4}
+                        className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-y bg-white"
+                      />
+                      <div className="flex justify-end gap-2 mt-2">
+                        <button
+                          onClick={() => setExpandedId(null)}
+                          className="px-4 py-1.5 text-sm text-gray-500 hover:text-gray-700 border border-gray-200 rounded-lg transition-colors"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          onClick={() => saveDetails(task.id)}
+                          disabled={savingDetails === task.id}
+                          className="px-4 py-1.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50"
+                        >
+                          {savingDetails === task.id ? "Saving…" : "Save Details"}
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               );
             })}

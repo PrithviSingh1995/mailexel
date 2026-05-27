@@ -17,6 +17,7 @@ const jetBrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  icons: { icon: "/favicon.png", apple: "/favicon.png", shortcut: "/favicon.png" },
   title: "MailExel — Email Viewer, Converter, Migration & Backup Software",
   description:
     "The ultimate email management suite. View, convert, migrate, and backup PST, MBOX, EML, MSG, OST and 150+ email formats. Trusted by 500,000+ IT professionals.",

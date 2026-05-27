@@ -134,12 +134,16 @@ export default function BlogPostClient({ post, related }: Props) {
           <p className="text-white/55 text-lg leading-relaxed mb-8 max-w-3xl">{post.excerpt}</p>
 
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-white/40 text-sm border-t border-white/10 pt-5">
-            <span className="flex items-center gap-2">
+            <button
+              onClick={() => document.getElementById("author-section")?.scrollIntoView({ behavior: "smooth", block: "center" })}
+              className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer"
+              title="View author bio"
+            >
               <span className="w-7 h-7 bg-white/10 rounded-full flex items-center justify-center text-white text-xs font-bold uppercase">
                 {post.author?.name?.[0] ?? "X"}
               </span>
               <span className="text-white/60">{post.author?.name ?? "MailExel Team"}</span>
-            </span>
+            </button>
             {post.publishedAt && (
               <span className="flex items-center gap-1.5">
                 <Calendar className="w-3.5 h-3.5" />{formatDate(post.publishedAt)}
@@ -220,7 +224,7 @@ export default function BlogPostClient({ post, related }: Props) {
       </div>
 
       {/* ── AUTHOR CARD ─────────────────────────────────────────────────────── */}
-      <section className="border-t border-gray-100 bg-white py-10">
+      <section id="author-section" className="border-t border-gray-100 bg-white py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="max-w-3xl flex items-start gap-5 bg-gray-50 border border-gray-200 rounded-2xl p-6">
             {post.author?.avatar ? (
@@ -271,7 +275,7 @@ export default function BlogPostClient({ post, related }: Props) {
             <h2 className="text-gray-900 text-2xl font-bold mb-7">Related Articles</h2>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
               {related.map((rel) => (
-                <Link key={rel._id} href={`/blog/${rel.slug}`}
+                <Link key={rel._id} href={`/${rel.slug}`}
                   className="group bg-white border border-gray-200 rounded-2xl overflow-hidden hover:border-gray-300 hover:shadow-md transition-all"
                 >
                   <div className="aspect-video bg-gray-100 overflow-hidden">

@@ -47,16 +47,26 @@ function AdminShell({ children }: { children: React.ReactNode }) {
   if (!user && pathname !== "/admin/login") return null;
   if (!user) return <>{children}</>;
 
-  const navItems = [
-    { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/admin/pages", label: "Pages", icon: Globe },
-    { href: "/admin/global", label: "Header & Footer", icon: Settings },
-    { href: "/admin/tasks", label: "Blog Tasks", icon: ClipboardList },
-    { href: "/admin/authors", label: "Authors", icon: Users },
-    { href: "/admin/reviews", label: "Reviews", icon: Star },
-    { href: "/admin/blogs", label: "All Posts", icon: FileText },
-    { href: "/admin/blogs/new", label: "New Post", icon: PlusCircle },
-    { href: "/admin/images", label: "Image Library", icon: Images },
+  const navGroups = [
+    {
+      label: "Content",
+      items: [
+        { href: "/admin/dashboard",  label: "Dashboard",      icon: LayoutDashboard },
+        { href: "/admin/blogs",      label: "All Posts",      icon: FileText },
+        { href: "/admin/blogs/new",  label: "New Post",       icon: PlusCircle },
+        { href: "/admin/authors",    label: "Authors",        icon: Users },
+        { href: "/admin/tasks",      label: "Blog Tasks",     icon: ClipboardList },
+        { href: "/admin/reviews",    label: "Reviews",        icon: Star },
+      ],
+    },
+    {
+      label: "Site",
+      items: [
+        { href: "/admin/pages",      label: "Pages",          icon: Globe },
+        { href: "/admin/global",     label: "Header & Footer", icon: Settings },
+        { href: "/admin/images",     label: "Image Library",  icon: Images },
+      ],
+    },
   ];
 
   const handleLogout = () => {
@@ -93,31 +103,35 @@ function AdminShell({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 py-4 px-3">
-          <p className="text-gray-400 text-xs font-semibold uppercase tracking-widest px-3 mb-2">
-            Content
-          </p>
-          {navItems.map(({ href, label, icon: Icon }) => {
-            const active =
-              pathname === href ||
-              (href !== "/admin/dashboard" && pathname.startsWith(href));
-            return (
-              <Link
-                key={href}
-                href={href}
-                onClick={() => setSidebarOpen(false)}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium mb-1 transition-colors ${
-                  active
-                    ? "bg-red-600 text-white"
-                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-                }`}
-              >
-                <Icon className="w-4 h-4 flex-shrink-0" />
-                {label}
-                {active && <ChevronRight className="w-3.5 h-3.5 ml-auto" />}
-              </Link>
-            );
-          })}
+        <nav className="flex-1 py-4 px-3 overflow-y-auto">
+          {navGroups.map((group) => (
+            <div key={group.label} className="mb-4">
+              <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest px-3 mb-1">
+                {group.label}
+              </p>
+              {group.items.map(({ href, label, icon: Icon }) => {
+                const active =
+                  pathname === href ||
+                  (href !== "/admin/dashboard" && pathname.startsWith(href));
+                return (
+                  <Link
+                    key={href}
+                    href={href}
+                    onClick={() => setSidebarOpen(false)}
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium mb-0.5 transition-colors ${
+                      active
+                        ? "bg-red-600 text-white"
+                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                    }`}
+                  >
+                    <Icon className="w-4 h-4 flex-shrink-0" />
+                    {label}
+                    {active && <ChevronRight className="w-3.5 h-3.5 ml-auto" />}
+                  </Link>
+                );
+              })}
+            </div>
+          ))}
         </nav>
 
         {/* User */}

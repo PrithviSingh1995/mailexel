@@ -55,6 +55,7 @@ model Review {
 model BlogTask {
   id               String   @id @default(cuid())
   title            String
+  details          String   @default("")
   status           String   @default("pending")
   assignedAuthorId String?
   assignedAuthor   User?    @relation(fields: [assignedAuthorId], references: [id], onDelete: SetNull)

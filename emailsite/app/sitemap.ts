@@ -22,7 +22,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       orderBy: { publishedAt: "desc" },
     });
     blogPages = posts.map((p) => ({
-      url: `${base}/blog/${p.slug}`,
+      url: `${base}/${p.slug}`,
       lastModified: p.updatedAt,
       changeFrequency: "monthly" as const,
       priority: 0.8,

@@ -10,13 +10,14 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
   try {
     const { id } = await params;
-    const { status, assignedAuthorId } = await req.json();
+    const { status, assignedAuthorId, details } = await req.json();
 
     const task = await prisma.blogTask.update({
       where: { id },
       data: {
         ...(status !== undefined ? { status } : {}),
         ...(assignedAuthorId !== undefined ? { assignedAuthorId: assignedAuthorId || null } : {}),
+        ...(details !== undefined ? { details } : {}),
       },
       include: { assignedAuthor: authorSelect },
     });

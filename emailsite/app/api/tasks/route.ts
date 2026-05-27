@@ -21,13 +21,14 @@ export async function POST(req: Request) {
   if (error) return error;
 
   try {
-    const { title, assignedAuthorId } = await req.json();
+    const { title, assignedAuthorId, details } = await req.json();
     if (!title?.trim())
       return NextResponse.json({ success: false, message: "Title is required" }, { status: 400 });
 
     const task = await prisma.blogTask.create({
       data: {
         title: title.trim(),
+        details: details ?? "",
         ...(assignedAuthorId ? { assignedAuthorId } : {}),
       },
       include: { assignedAuthor: authorSelect },

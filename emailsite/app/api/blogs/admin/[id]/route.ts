@@ -47,14 +47,23 @@ export async function PUT(
 
     const body = await request.json();
     const tagList = body.tags !== undefined ? (Array.isArray(body.tags) ? body.tags : String(body.tags).split(",").map((t: string) => t.trim())) : undefined;
-    const newSlug = body.title && body.title !== existing.title ? await uniqueSlug(body.title, id) : undefined;
     const publishedAt = body.status === "published" && existing.status !== "published" ? new Date() : existing.publishedAt;
+
+    let resolvedSlug: string | undefined;
+    if (body.slug !== undefined && body.slug !== existing.slug) {
+      const clean = body.slug.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+      const conflict = await prisma.blog.findFirst({ where: { slug: clean, NOT: { id } } });
+      if (conflict) return NextResponse.json({ success: false, message: "That slug is already in use" }, { status: 409 });
+      resolvedSlug = clean;
+    } else if (body.title && body.title !== existing.title && body.slug === undefined) {
+      resolvedSlug = await uniqueSlug(body.title, id);
+    }
 
     const blog = await prisma.blog.update({
       where: { id },
       data: {
         ...(body.title !== undefined && { title: body.title }),
-        ...(newSlug && { slug: newSlug }),
+        ...(resolvedSlug && { slug: resolvedSlug }),
         ...(body.excerpt !== undefined && { excerpt: body.excerpt }),
         ...(body.content !== undefined && { content: body.content }),
         ...(body.category !== undefined && { category: body.category }),

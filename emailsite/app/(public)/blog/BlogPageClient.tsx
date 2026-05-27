@@ -45,9 +45,9 @@ function formatDate(iso: string) {
 function BlogCard({ post, featured }: { post: BlogPost; featured?: boolean }) {
   return (
     <Link
-      href={`/blog/${post.slug}`}
+      href={`/${post.slug}`}
       className={`group flex flex-col bg-white border border-gray-200 rounded-2xl overflow-hidden hover:border-gray-300 hover:shadow-lg transition-all duration-300 ${
-        featured ? "lg:flex-row" : ""
+        featured ? "lg:flex-row-reverse" : ""
       }`}
     >
       {/* Image */}

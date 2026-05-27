@@ -56,7 +56,7 @@ interface Props {
 function PostCard({ post, featured }: { post: PostData; featured?: boolean }) {
   return (
     <Link
-      href={`/blog/${post.slug}`}
+      href={`/${post.slug}`}
       className={`group bg-white border border-gray-200 rounded-2xl overflow-hidden hover:border-red-200 hover:shadow-lg transition-all duration-300 flex ${
         featured ? "flex-col sm:flex-row" : "flex-col"
       }`}

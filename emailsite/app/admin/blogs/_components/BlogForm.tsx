@@ -200,6 +200,7 @@ export default function BlogForm({ blog, mode }: BlogFormProps) {
 
   const [form, setForm] = useState({
     title: blog?.title ?? "",
+    slug: blog?.slug ?? "",
     excerpt: blog?.excerpt ?? "",
     content: blog?.content ?? "",
     category: blog?.category ?? "",
@@ -250,8 +251,18 @@ export default function BlogForm({ blog, mode }: BlogFormProps) {
 
   const set =
     (field: keyof typeof form) =>
-    (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
-      setForm((prev) => ({ ...prev, [field]: e.target.value }));
+    (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+      const value = e.target.value;
+      setForm((prev) => {
+        const next = { ...prev, [field]: value };
+        // Auto-generate slug from title only in create mode and when slug hasn't been manually edited
+        if (field === "title" && mode === "create") {
+          const auto = value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+          next.slug = auto;
+        }
+        return next;
+      });
+    };
 
   const saveCursor = () => {
     if (textareaRef.current) cursorPosRef.current = textareaRef.current.selectionStart;
@@ -305,6 +316,7 @@ export default function BlogForm({ blog, mode }: BlogFormProps) {
 
   const buildPayload = (status: "draft" | "published") => ({
     title: form.title,
+    slug: form.slug || undefined,
     excerpt: form.excerpt,
     content: form.content,
     category: form.category,
@@ -721,6 +733,19 @@ export default function BlogForm({ blog, mode }: BlogFormProps) {
           {/* SEO */}
           <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-4">
             <h3 className="text-gray-500 text-xs font-semibold uppercase tracking-wide">SEO</h3>
+            <div>
+              <label className="block text-gray-500 text-xs mb-1.5">URL Slug</label>
+              <div className="flex items-center bg-gray-50 border border-gray-200 rounded-lg overflow-hidden focus-within:border-red-300 transition-colors">
+                <span className="px-2 text-gray-400 text-xs border-r border-gray-200 py-2 select-none flex-shrink-0">/</span>
+                <input
+                  value={form.slug}
+                  onChange={set("slug")}
+                  placeholder="post-url-slug"
+                  className="flex-1 bg-transparent px-2 py-2 text-gray-700 text-xs placeholder-gray-400 focus:outline-none"
+                />
+              </div>
+              <p className="text-gray-400 text-xs mt-0.5">Auto-generated from title. Edit to customise.</p>
+            </div>
             <div>
               <label className="block text-gray-500 text-xs mb-1.5">Meta Title</label>
               <input
